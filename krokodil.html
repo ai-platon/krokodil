@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🐊 КРОКОДИЛ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Martian+Mono:wght@300;400;500;700&family=Mulish:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --g:#00e676;--g2:#69f0ae;--g3:rgba(0,230,118,.1);
+  --y:#ffea00;--y2:#ffd600;
+  --r:#ff1744;--r2:#ff5252;
+  --b:#00b0ff;--b2:#40c4ff;
+  --bg:#060a0e;--bg2:#0a1018;--bg3:#0d1520;
+  --panel:#0b1520;--panel2:#0e1c2a;
+  --txt:#e8f5f9;--txt2:#90a4ae;--txt3:#546e7a;
+  --radius:16px;--radius-sm:10px;
+}
+html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Mulish',sans-serif;overflow-x:hidden;font-size:16px;-webkit-font-smoothing:antialiased}
+
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 70% 50% at 15% 20%,rgba(0,230,118,.04) 0%,transparent 60%),
+    radial-gradient(ellipse 60% 60% at 85% 80%,rgba(0,176,255,.035) 0%,transparent 60%),
+    radial-gradient(ellipse 100% 80% at 50% 110%,rgba(0,60,80,.18) 0%,transparent 70%);
+  animation:bgP 10s ease-in-out infinite alternate}
+@keyframes bgP{0%{opacity:.6}100%{opacity:1}}
+body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(0,230,118,.011) 1px,transparent 1px),linear-gradient(90deg,rgba(0,230,118,.011) 1px,transparent 1px);
+  background-size:48px 48px;animation:gridD 40s linear infinite}
+@keyframes gridD{0%{background-position:0 0}100%{background-position:48px 48px}}
+
+.app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;padding-bottom:76px}
+
+/* HEADER */
+.header{padding:20px 20px 14px;text-align:center;position:relative;border-bottom:1px solid rgba(0,230,118,.1)}
+.header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,230,118,.35),transparent);animation:hSh 4s ease-in-out infinite}
+@keyframes hSh{0%,100%{opacity:.4}50%{opacity:1}}
+.croc-glyph{font-size:42px;display:block;filter:drop-shadow(0 0 18px rgba(0,230,118,.6));animation:cF 3.5s ease-in-out infinite;margin-bottom:4px}
+@keyframes cF{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-7px) rotate(2deg)}}
+.header-title{font-family:'Unbounded',sans-serif;font-size:clamp(22px,7vw,34px);font-weight:900;letter-spacing:-1px;
+  background:linear-gradient(135deg,var(--g) 0%,var(--y) 55%,var(--g2) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:tS 7s ease-in-out infinite alternate}
+@keyframes tS{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(20deg)}}
+.header-sub{font-family:'Martian Mono',monospace;font-size:10px;color:var(--txt3);letter-spacing:3px;margin-top:4px;animation:sF 4s ease-in-out infinite}
+@keyframes sF{0%,100%{opacity:.35}50%{opacity:.85}}
+
+/* SCROLL */
+.scroll-area{flex:1;overflow-y:auto;padding:14px 14px 8px;display:flex;flex-direction:column;gap:14px}
+.scroll-area::-webkit-scrollbar{width:3px}
+.scroll-area::-webkit-scrollbar-thumb{background:rgba(0,230,118,.2);border-radius:2px}
+
+/* CARDS */
+.card{background:var(--panel);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:16px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.07),transparent)}
+.card-label{font-family:'Martian Mono',monospace;font-size:10px;color:var(--g);letter-spacing:3px;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.card-label .ld{width:6px;height:6px;border-radius:50%;background:var(--g);box-shadow:0 0 10px var(--g);animation:ldot 1.8s ease-in-out infinite;flex-shrink:0}
+@keyframes ldot{0%,100%{opacity:.5;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+
+/* API */
+.api-wrap{display:flex;border:1px solid rgba(0,230,118,.22);border-radius:var(--radius-sm);overflow:hidden;background:rgba(0,0,0,.3);transition:border-color .2s,box-shadow .2s}
+.api-wrap:focus-within{border-color:rgba(0,230,118,.5);box-shadow:0 0 20px rgba(0,230,118,.08)}
+.api-input{flex:1;background:transparent;border:none;padding:12px 14px;color:var(--txt);font-family:'Martian Mono',monospace;font-size:12px;outline:none;letter-spacing:.5px}
+.api-input::placeholder{color:var(--txt3);font-family:'Mulish',sans-serif;letter-spacing:0;font-size:13px}
+.api-btn{background:rgba(0,230,118,.1);border:none;border-left:1px solid rgba(0,230,118,.2);padding:0 18px;color:var(--g);cursor:pointer;font-family:'Martian Mono',monospace;font-size:11px;letter-spacing:1px;transition:all .2s;white-space:nowrap}
+.api-btn:hover{background:rgba(0,230,118,.22);color:#fff}
+.api-connected{display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(0,230,118,.05);border:1px solid rgba(0,230,118,.2);border-radius:var(--radius-sm);padding:11px 14px}
+.api-conn-status{display:flex;align-items:center;gap:8px;font-family:'Martian Mono',monospace;font-size:11px;color:var(--g);letter-spacing:1px}
+.conn-dot{width:7px;height:7px;border-radius:50%;background:var(--g);box-shadow:0 0 10px var(--g);animation:cB 1.5s ease-in-out infinite;flex-shrink:0}
+@keyframes cB{0%,100%{opacity:.4}50%{opacity:1}}
+.api-disc-btn{background:none;border:1px solid rgba(255,23,68,.25);border-radius:6px;color:var(--txt3);font-family:'Martian Mono',monospace;font-size:10px;cursor:pointer;padding:5px 10px;transition:all .2s;letter-spacing:.5px}
+.api-disc-btn:hover{color:var(--r);border-color:rgba(255,23,68,.5);background:rgba(255,23,68,.08)}
+.api-hint{font-family:'Martian Mono',monospace;font-size:10px;color:var(--txt3);letter-spacing:1px;text-align:center;margin-top:8px;line-height:1.8}
+.api-hint a{color:var(--y);text-decoration:none;transition:color .2s}
+.api-hint a:hover{color:var(--y2)}
+
+/* TOPICS */
+.topic-scroll{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:4px}
+.topic-chip{display:flex;align-items:center;gap:6px;padding:8px 13px;border-radius:100px;border:1.5px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:var(--txt2);font-size:13px;font-weight:600;cursor:pointer;transition:all .22s;user-select:none;position:relative;overflow:hidden}
+.topic-chip::after{content:'';position:absolute;left:-100%;top:0;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.07),transparent);transition:left .4s;pointer-events:none}
+.topic-chip:hover::after{left:150%}
+.topic-chip:active{transform:scale(.93)}
+.topic-chip.selected{border-color:var(--g);background:rgba(0,230,118,.1);color:var(--g);box-shadow:0 0 12px rgba(0,230,118,.08)}
+.topic-chip .tc-i{font-size:16px;transition:transform .2s}
+.topic-chip.selected .tc-i{animation:iW 2s ease-in-out infinite}
+@keyframes iW{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
+.topic-chip.tc-custom{border-style:dashed;border-color:rgba(255,234,0,.25);color:var(--y2)}
+.topic-chip.tc-custom.selected{border-color:var(--y);background:rgba(255,234,0,.08);color:var(--y)}
+.custom-row{display:flex;gap:8px;margin-top:10px}
+.custom-inp{flex:1;background:rgba(0,0,0,.3);border:1.5px solid rgba(255,255,255,.1);border-radius:var(--radius-sm);padding:11px 14px;color:var(--txt);font-family:'Mulish',sans-serif;font-size:13px;font-weight:500;outline:none;transition:border-color .2s}
+.custom-inp:focus{border-color:rgba(255,234,0,.4)}
+.custom-inp::placeholder{color:var(--txt3)}
+.add-topic-btn{padding:11px 16px;border-radius:var(--radius-sm);border:1.5px solid rgba(255,234,0,.3);background:rgba(255,234,0,.07);color:var(--y);font-family:'Unbounded',sans-serif;font-size:10px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap}
+.add-topic-btn:hover{background:rgba(255,234,0,.15)}
+.add-topic-btn:active{transform:scale(.95)}
+.selected-meta{font-family:'Martian Mono',monospace;font-size:11px;color:var(--txt3);margin-top:10px;letter-spacing:.3px}
+.selected-meta strong{color:var(--g)}
+
+/* DIFFICULTY */
+.diff-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.diff-btn{padding:13px 6px 11px;border-radius:var(--radius-sm);border:1.5px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02);color:var(--txt3);font-family:'Unbounded',sans-serif;font-size:8px;font-weight:700;cursor:pointer;transition:all .22s;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;overflow:hidden}
+.diff-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.05),transparent);opacity:0;transition:opacity .2s}
+.diff-btn:hover::before{opacity:1}
+.diff-btn:active{transform:scale(.95)}
+.diff-btn .di{font-size:24px;transition:transform .2s}
+.diff-btn:hover .di{transform:scale(1.15)}
+.diff-easy-act{border-color:rgba(0,230,118,.4)!important;color:var(--g)!important;background:rgba(0,230,118,.08)!important;box-shadow:0 0 16px rgba(0,230,118,.08)!important}
+.diff-med-act{border-color:rgba(255,234,0,.4)!important;color:var(--y)!important;background:rgba(255,234,0,.08)!important;box-shadow:0 0 16px rgba(255,234,0,.08)!important}
+.diff-hard-act{border-color:rgba(255,23,68,.4)!important;color:var(--r)!important;background:rgba(255,23,68,.08)!important;box-shadow:0 0 16px rgba(255,23,68,.08)!important}
+.diff-desc{font-family:'Martian Mono',monospace;font-size:10px;color:var(--txt3);margin-top:10px;letter-spacing:.3px;line-height:1.8;min-height:34px;transition:all .3s}
+
+/* COUNT */
+.count-row{display:flex;align-items:center;gap:14px}
+.count-label{flex:1;font-size:14px;color:var(--txt2);font-weight:500}
+.count-ctrl{display:flex;align-items:center;border:1.5px solid rgba(255,255,255,.1);border-radius:var(--radius-sm);overflow:hidden}
+.ccb{width:42px;height:42px;background:rgba(255,255,255,.04);border:none;color:var(--txt);font-size:20px;cursor:pointer;transition:background .18s,color .18s,transform .15s cubic-bezier(.34,1.56,.64,1),box-shadow .18s,border-color .18s;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.ccb::after{content:'';position:absolute;inset:0;border-radius:inherit;background:radial-gradient(circle at center,rgba(0,230,118,.35) 0%,transparent 70%);opacity:0;transform:scale(0);transition:opacity .3s,transform .3s}
+.ccb.pulse::after{animation:ccbPulse .45s ease-out forwards}
+@keyframes ccbPulse{0%{opacity:.8;transform:scale(0)}60%{opacity:.6;transform:scale(1.1)}100%{opacity:0;transform:scale(1.4)}}
+.ccb:hover{background:rgba(0,230,118,.12);color:var(--g)}
+.ccb:active{transform:scale(.82);background:rgba(0,230,118,.2);color:var(--g);box-shadow:0 0 18px rgba(0,230,118,.35),inset 0 0 8px rgba(0,230,118,.15);border-color:rgba(0,230,118,.4)}
+.count-val{width:52px;text-align:center;font-family:'Unbounded',sans-serif;font-size:18px;font-weight:900;color:var(--g);background:rgba(0,230,118,.06);height:42px;line-height:42px}
+
+/* MODE SELECTOR */
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mode-btn{padding:18px 12px;border-radius:var(--radius);border:1.5px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:var(--txt2);cursor:pointer;transition:all .25s;display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;overflow:hidden}
+.mode-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.06),transparent);opacity:0;transition:opacity .2s}
+.mode-btn:hover::before{opacity:1}
+.mode-btn:active{transform:scale(.96)}
+.mode-btn .mode-icon{font-size:38px;filter:drop-shadow(0 0 10px rgba(255,255,255,.2))}
+.mode-btn .mode-name{font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;letter-spacing:.5px}
+.mode-btn .mode-desc{font-family:'Martian Mono',monospace;font-size:10px;color:var(--txt3);letter-spacing:.3px;text-align:center;line-height:1.7}
+.mode-solo{border-color:rgba(0,176,255,.3)!important;color:var(--b)!important;background:rgba(0,176,255,.06)!important}
+.mode-solo .mode-icon{filter:drop-shadow(0 0 12px rgba(0,176,255,.4))!important}
+.mode-team{border-color:rgba(0,230,118,.3)!important;color:var(--g)!important;background:rgba(0,230,118,.06)!important}
+.mode-team .mode-icon{filter:drop-shadow(0 0 12px rgba(0,230,118,.4))!important}
+
+/* GENERATE BUTTON */
+.gen-btn-wrap{padding:0 14px;margin-top:4px;flex-shrink:0}
+.gen-btn{width:100%;padding:19px;border:none;border-radius:var(--radius);cursor:pointer;font-family:'Unbounded',sans-serif;font-size:15px;font-weight:900;letter-spacing:.5px;position:relative;overflow:hidden;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:10px}
+.gen-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--g) 0%,var(--g2) 50%,var(--y) 100%)}
+.gen-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15),transparent 50%,transparent);opacity:0;transition:opacity .2s}
+.gen-btn:hover::after{opacity:1}
+.gen-btn:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,230,118,.35),0 4px 20px rgba(0,230,118,.2)}
+.gen-btn:active{transform:translateY(0) scale(.98)}
+.gen-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+.gen-btn-txt{position:relative;z-index:1;color:#04120a}
+.gen-btn-ico{font-size:22px;position:relative;z-index:1}
+.gen-btn.loading::before{animation:gbP .8s ease-in-out infinite alternate}
+@keyframes gbP{0%{opacity:.6}100%{opacity:1}}
+.gen-info{font-family:'Martian Mono',monospace;font-size:10px;color:var(--txt3);text-align:center;letter-spacing:.5px;margin-bottom:6px;opacity:.6}
+
+/* RESULTS */
+.results-card{background:var(--panel);border:1.5px solid rgba(0,230,118,.25);border-radius:var(--radius);padding:16px;position:relative;overflow:hidden;box-shadow:0 0 40px rgba(0,230,118,.05);animation:cIn .45s cubic-bezier(.4,0,.2,1)}
+@keyframes cIn{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+.results-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--g),var(--y),var(--g),transparent);background-size:200% 100%;animation:rS 2s linear infinite}
+@keyframes rS{0%{background-position:-200% 0}100%{background-position:200% 0}}
+.results-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;gap:10px}
+.res-title{font-family:'Unbounded',sans-serif;font-size:12px;font-weight:700;color:var(--g);letter-spacing:2px}
+.res-meta{font-family:'Martian Mono',monospace;font-size:10px;color:var(--txt3);margin-top:3px;letter-spacing:.3px}
+.copy-all-btn{padding:8px 14px;border-radius:8px;border:1px solid rgba(0,230,118,.2);background:rgba(0,230,118,.06);color:var(--g);font-family:'Martian Mono',monospace;font-size:10px;cursor:pointer;transition:all .18s;white-space:nowrap;flex-shrink:0}
+.copy-all-btn:hover{background:rgba(0,230,118,.15);border-color:var(--g)}
+.copy-all-btn:active{transform:scale(.95)}
+.words-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
+.word-card{background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.07);border-radius:var(--radius-sm);padding:12px 14px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.word-card::before{content:'';position:absolute;left:-100%;top:0;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(0,230,118,.07),transparent);transition:left .35s}
+.word-card:hover::before{left:150%}
+.word-card:hover{border-color:rgba(0,230,118,.3);background:rgba(0,230,118,.05);transform:translateX(3px)}
+.word-card:active{transform:scale(.95)}
+.word-card.copied{border-color:var(--g)!important;background:rgba(0,230,118,.1)!important}
+.word-text{font-size:14px;font-weight:700;color:var(--txt);letter-spacing:.2px;line-height:1.3}
+.word-copy-ico{font-size:13px;color:var(--txt3);opacity:0;transition:all .15s;flex-shrink:0}
+.word-card:hover .word-copy-ico{opacity:1}
+.word-card:nth-child(n){animation:wIn .3s ease both}
+.word-card:nth-child(1){animation-delay:.00s}.word-card:nth-child(2){animation-delay:.04s}
+.word-card:nth-child(3){animation-delay:.08s}.word-card:nth-child(4){animation-delay:.12s}
+.word-card:nth-child(5){animation-delay:.16s}.word-card:nth-child(6){animation-delay:.20s}
+.word-card:nth-child(7){animation-delay:.24s}.word-card:nth-child(8){animation-delay:.28s}
+.word-card:nth-child(9){animation-delay:.32s}.word-card:nth-child(10){animation-delay:.36s}
+.word-card:nth-child(11){animation-delay:.40s}.word-card:nth-child(12){animation-delay:.44s}
+.word-card:nth-child(13){animation-delay:.48s}.word-card:nth-child(14){animation-delay:.52s}
+.word-card:nth-child(15){animation-delay:.56s}.word-card:nth-child(16){animation-delay:.60s}
+.word-card:nth-child(17){animation-delay:.64s}.word-card:nth-child(18){animation-delay:.68s}
+.word-card:nth-child(19){animation-delay:.72s}.word-card:nth-child(20){animation-delay:.76s}
+@keyframes wIn{from{opacity:0;transform:scale(.85) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+
+/* LOADING */
+.loading-box{padding:28px 20px;text-align:center}
+.loading-croc{font-size:48px;animation:lC 1s ease-in-out infinite;display:block;margin-bottom:12px}
+@keyframes lC{0%,100%{transform:rotate(-5deg) scale(1)}50%{transform:rotate(5deg) scale(1.1)}}
+.loading-text{font-family:'Martian Mono',monospace;font-size:11px;color:var(--g);letter-spacing:2px;animation:lP .8s ease-in-out infinite}
+@keyframes lP{0%,100%{opacity:.3}50%{opacity:1}}
+.loading-dots{display:flex;gap:6px;justify-content:center;margin-top:14px}
+.loading-dots span{width:8px;height:8px;border-radius:50%;background:var(--g);animation:dP .7s ease-in-out infinite}
+.loading-dots span:nth-child(2){animation-delay:.15s}.loading-dots span:nth-child(3){animation-delay:.3s}
+@keyframes dP{0%,80%,100%{transform:scale(.6);opacity:.3}40%{transform:scale(1.1);opacity:1}}
+
+/* ERROR */
+.error-box{background:rgba(255,23,68,.06);border:1px solid rgba(255,23,68,.25);border-radius:var(--radius-sm);padding:14px 16px;color:var(--r2);font-size:13px;font-family:'Martian Mono',monospace;letter-spacing:.3px;line-height:1.7}
+
+/* PARTICLES */
+.particle-canvas{position:fixed;inset:0;pointer-events:none;z-index:100;overflow:hidden}
+.particle{position:absolute;border-radius:50%;animation:pUp linear forwards}
+@keyframes pUp{0%{transform:translateY(0) scale(1);opacity:.9}100%{transform:translateY(-200px) translateX(var(--dx)) scale(0);opacity:0}}
+
+/* TOAST */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(4,8,14,.97);border:1px solid rgba(0,230,118,.35);border-radius:100px;padding:11px 22px;font-family:'Martian Mono',monospace;font-size:11px;color:var(--g);letter-spacing:1px;opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;z-index:200;white-space:nowrap;box-shadow:0 8px 30px rgba(0,0,0,.5),0 0 18px rgba(0,230,118,.1)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(6,10,14,.97);border-top:1px solid rgba(255,255,255,.07);display:flex;z-index:50;padding-bottom:env(safe-area-inset-bottom)}
+.nav-tab{flex:1;padding:11px 8px 9px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:all .2s;border:none;background:none;color:var(--txt3);font-family:'Martian Mono',monospace;font-size:9px;letter-spacing:1px;border-top:2px solid transparent;position:relative}
+.nav-tab:active{transform:scale(.93)}
+.nav-tab.active{color:var(--g);border-top-color:var(--g)}
+.nav-tab.active .nav-icon{filter:drop-shadow(0 0 8px var(--g))}
+.nav-icon{font-size:21px;transition:transform .2s}
+.nav-tab:hover .nav-icon{transform:scale(1.12)}
+.nav-badge{position:absolute;top:5px;right:calc(50% - 18px);background:var(--r);color:#fff;font-size:9px;border-radius:100px;padding:1px 5px;font-family:'Unbounded',sans-serif;min-width:16px;text-align:center}
+
+/* PAGES */
+.page{display:none;flex-direction:column;gap:14px}
+.page.active{display:flex;animation:pIn .3s ease both}
+@keyframes pIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
+
+/* HISTORY */
+.hist-empty{text-align:center;padding:36px 20px;font-family:'Martian Mono',monospace;font-size:12px;color:var(--txt3);letter-spacing:1px;line-height:2.5}
+.hist-icon{font-size:44px;display:block;margin-bottom:10px;opacity:.35}
+.hist-entry{background:var(--panel);border:1px solid rgba(255,255,255,.07);border-radius:var(--radius);padding:14px;animation:cIn .35s ease both}
+.hist-entry-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:8px}
+.hist-entry-meta{font-family:'Martian Mono',monospace;font-size:10px;color:var(--txt3);letter-spacing:.3px;line-height:1.9}
+.hdiff{padding:3px 10px;border-radius:100px;font-family:'Martian Mono',monospace;font-size:10px;border:1px solid;letter-spacing:.3px;flex-shrink:0}
+.hdiff-easy{border-color:rgba(0,230,118,.3);color:var(--g);background:rgba(0,230,118,.08)}
+.hdiff-medium{border-color:rgba(255,234,0,.3);color:var(--y);background:rgba(255,234,0,.08)}
+.hdiff-hard{border-color:rgba(255,23,68,.3);color:var(--r);background:rgba(255,23,68,.08)}
+.hist-words{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.hist-word-chip{padding:5px 10px;border-radius:100px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);font-size:12px;color:var(--txt2);cursor:pointer;transition:all .15s}
+.hist-word-chip:hover{border-color:rgba(0,230,118,.3);color:var(--g)}
+.hist-clear-btn{width:100%;padding:13px;border:1px solid rgba(255,23,68,.2);border-radius:var(--radius-sm);background:rgba(255,23,68,.04);color:var(--txt3);font-family:'Martian Mono',monospace;font-size:11px;cursor:pointer;transition:all .2s;letter-spacing:1px}
+.hist-clear-btn:hover{border-color:rgba(255,23,68,.4);color:var(--r);background:rgba(255,23,68,.1)}
+
+/* ─────────────── TEAM MODE ─────────────── */
+/* STEP 0: mode select is on main page */
+
+/* STEP 1: players input */
+.players-list{display:flex;flex-direction:column;gap:8px}
+.player-row{display:flex;gap:8px;align-items:center;animation:wIn .25s ease both}
+.player-input{flex:1;background:rgba(0,0,0,.3);border:1.5px solid rgba(255,255,255,.1);border-radius:var(--radius-sm);padding:11px 14px;color:var(--txt);font-family:'Mulish',sans-serif;font-size:14px;font-weight:600;outline:none;transition:border-color .2s}
+.player-input:focus{border-color:rgba(0,230,118,.4)}
+.player-input::placeholder{color:var(--txt3)}
+.del-player-btn{width:38px;height:38px;border-radius:8px;border:1px solid rgba(255,23,68,.2);background:rgba(255,23,68,.06);color:var(--txt3);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.del-player-btn:hover{color:var(--r);border-color:rgba(255,23,68,.4)}
+.add-player-btn{width:100%;padding:13px;border:1.5px dashed rgba(0,230,118,.25);border-radius:var(--radius-sm);background:rgba(0,230,118,.04);color:var(--g);font-family:'Martian Mono',monospace;font-size:11px;cursor:pointer;transition:all .2s;letter-spacing:1.5px}
+.add-player-btn:hover{background:rgba(0,230,118,.1);border-color:rgba(0,230,118,.4)}
+.add-player-btn:active{transform:scale(.97)}
+
+/* big action button */
+.big-btn{width:100%;padding:18px;border:none;border-radius:var(--radius);cursor:pointer;font-family:'Unbounded',sans-serif;font-size:13px;font-weight:900;letter-spacing:.5px;position:relative;overflow:hidden;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:10px}
+.big-btn::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,0);transition:background .2s}
+.big-btn:hover::after{background:rgba(255,255,255,.07)}
+.big-btn:active{transform:scale(.97)}
+.big-btn-green{background:linear-gradient(135deg,var(--g),var(--g2))}
+.big-btn-green .btxt{color:#04120a}
+.big-btn-blue{background:linear-gradient(135deg,var(--b),var(--b2))}
+.big-btn-blue .btxt{color:#03101a}
+.big-btn-yellow{background:linear-gradient(135deg,var(--y),var(--y2))}
+.big-btn-yellow .btxt{color:#15120a}
+.big-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btxt{position:relative;z-index:1;pointer-events:none}
+.bico{font-size:22px;position:relative;z-index:1;pointer-events:none}
+
+/* ── GAME SCREEN ── */
+.game-screen{background:var(--panel);border-radius:var(--radius);overflow:hidden;border:1px solid rgba(0,230,118,.15)}
+.gs-header{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(0,0,0,.2)}
+.gs-round-info{font-family:'Martian Mono',monospace;font-size:10px;color:var(--txt3);letter-spacing:1.5px}
+.gs-score-row{display:flex;gap:6px;align-items:center}
+.gs-player-name{font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;color:var(--g);text-shadow:0 0 14px rgba(0,230,118,.4)}
+
+/* Player card: "your turn" */
+.player-turn-card{padding:24px 16px;text-align:center;border-bottom:1px solid rgba(255,255,255,.06)}
+.ptc-avatar{font-size:54px;display:block;margin-bottom:8px;animation:cF 2.5s ease-in-out infinite}
+.ptc-label{font-family:'Martian Mono',monospace;font-size:10px;color:var(--txt3);letter-spacing:2px;margin-bottom:4px}
+.ptc-name{font-family:'Unbounded',sans-serif;font-size:22px;font-weight:900;color:var(--g);letter-spacing:1px;text-shadow:0 0 24px rgba(0,230,118,.5)}
+.ptc-sub{font-size:13px;color:var(--txt2);margin-top:6px;font-weight:500}
+
+/* Word reveal */
+.word-reveal-wrap{padding:20px 16px;text-align:center;border-bottom:1px solid rgba(255,255,255,.06)}
+.wr-label{font-family:'Martian Mono',monospace;font-size:10px;color:var(--txt3);letter-spacing:2px;margin-bottom:12px}
+.wr-word{font-family:'Unbounded',sans-serif;font-size:clamp(22px,6vw,36px);font-weight:900;color:var(--y);text-shadow:0 0 30px rgba(255,234,0,.5),0 0 60px rgba(255,234,0,.2);letter-spacing:1px;animation:wGlow 2s ease-in-out infinite alternate}
+@keyframes wGlow{0%{text-shadow:0 0 20px rgba(255,234,0,.4)}100%{text-shadow:0 0 40px rgba(255,234,0,.7),0 0 70px rgba(255,234,0,.3)}}
+.wr-hint{font-family:'Martian Mono',monospace;font-size:10px;color:var(--txt3);margin-top:8px;letter-spacing:1px}
+.words-picker{padding:14px;display:flex;flex-wrap:wrap;gap:7px;justify-content:center;border-bottom:1px solid rgba(255,255,255,.06)}
+.pick-word-btn{padding:10px 18px;border-radius:100px;border:1.5px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:var(--txt);font-size:14px;font-weight:700;cursor:pointer;transition:all .22s;user-select:none}
+.pick-word-btn:hover{border-color:rgba(255,234,0,.5);color:var(--y);background:rgba(255,234,0,.07)}
+.pick-word-btn:active{transform:scale(.93)}
+.pick-word-btn.chosen{border-color:var(--y)!important;color:var(--y)!important;background:rgba(255,234,0,.12)!important;box-shadow:0 0 14px rgba(255,234,0,.15)!important}
+
+/* TIMER */
+.timer-section{padding:14px 16px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.timer-ring-wrap{position:relative;width:120px;height:120px}
+.timer-ring-wrap svg{transform:rotate(-90deg)}
+.timer-track{fill:none;stroke:rgba(255,255,255,.07);stroke-width:8}
+.timer-fill{fill:none;stroke:var(--g);stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset .1s linear, stroke .5s;stroke-dasharray:339.3;stroke-dashoffset:0}
+.timer-val{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Unbounded',sans-serif;font-size:30px;font-weight:900;color:var(--g);text-shadow:0 0 20px rgba(0,230,118,.5);transition:color .3s}
+.timer-label{font-family:'Martian Mono',monospace;font-size:10px;color:var(--txt3);letter-spacing:2px}
+.timer-actions{display:flex;gap:8px;width:100%}
+.timer-action-btn{flex:1;padding:14px;border-radius:var(--radius-sm);border:none;font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s}
+.ta-start{background:linear-gradient(135deg,var(--g),var(--g2));color:#04120a}
+.ta-start:hover{box-shadow:0 6px 20px rgba(0,230,118,.3)}
+.ta-done{background:linear-gradient(135deg,var(--b),var(--b2));color:#03101a}
+.ta-done:hover{box-shadow:0 6px 20px rgba(0,176,255,.3)}
+.ta-skip{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)!important;color:var(--txt2)}
+.ta-skip:hover{background:rgba(255,255,255,.1)}
+
+/* SCOREBOARD */
+.score-header{padding:14px 16px;text-align:center;border-bottom:1px solid rgba(255,255,255,.06)}
+.score-title{font-family:'Unbounded',sans-serif;font-size:14px;font-weight:900;color:var(--g);letter-spacing:2px;margin-bottom:4px}
+.score-sub{font-family:'Martian Mono',monospace;font-size:10px;color:var(--txt3);letter-spacing:1.5px}
+.score-list{padding:14px;display:flex;flex-direction:column;gap:8px}
+.score-entry{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:var(--radius-sm);background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);animation:wIn .3s ease both}
+.score-entry.is-current{border-color:rgba(0,230,118,.35);background:rgba(0,230,118,.07)}
+.score-rank{font-family:'Unbounded',sans-serif;font-size:16px;width:28px;text-align:center;flex-shrink:0}
+.score-info{flex:1}
+.score-name{font-size:15px;font-weight:700;color:var(--txt)}
+.score-stats{font-family:'Martian Mono',monospace;font-size:10px;color:var(--txt3);margin-top:3px;letter-spacing:.3px}
+.score-time{font-family:'Unbounded',sans-serif;font-size:14px;font-weight:700;color:var(--g)}
+.score-actions{padding:14px;display:flex;flex-direction:column;gap:8px}
+
+/* LEADERBOARD PAGE */
+.lb-empty{text-align:center;padding:36px 20px;font-family:'Martian Mono',monospace;font-size:12px;color:var(--txt3);letter-spacing:1px;line-height:2.5}
+.lb-icon{font-size:44px;display:block;margin-bottom:10px;opacity:.35}
+.lb-section{background:var(--panel);border:1px solid rgba(255,255,255,.07);border-radius:var(--radius);overflow:hidden;margin-bottom:2px}
+.lb-section-header{padding:12px 16px;background:rgba(0,0,0,.2);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.06)}
+.lb-topic-name{font-family:'Martian Mono',monospace;font-size:11px;color:var(--g);letter-spacing:1px}
+.lb-section-meta{font-family:'Martian Mono',monospace;font-size:10px;color:var(--txt3);letter-spacing:.5px}
+.lb-row{display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid rgba(255,255,255,.04);transition:background .15s}
+.lb-row:last-child{border-bottom:none}
+.lb-row:hover{background:rgba(255,255,255,.02)}
+.lb-rank{font-family:'Unbounded',sans-serif;font-size:14px;width:24px;text-align:center;flex-shrink:0}
+.lb-name{flex:1;font-size:14px;font-weight:600;color:var(--txt)}
+.lb-best{font-family:'Martian Mono',monospace;font-size:12px;color:var(--g);letter-spacing:.5px}
+.lb-best-label{font-family:'Martian Mono',monospace;font-size:9px;color:var(--txt3);letter-spacing:.3px;margin-top:2px}
+.lb-clear-btn{margin:12px 14px;width:calc(100% - 28px);padding:12px;border:1px solid rgba(255,23,68,.2);border-radius:8px;background:rgba(255,23,68,.04);color:var(--txt3);font-family:'Martian Mono',monospace;font-size:10px;cursor:pointer;transition:all .2s;letter-spacing:1px;display:block}
+.lb-clear-btn:hover{border-color:rgba(255,23,68,.4);color:var(--r)}
+
+/* FOOTER */
+.footer{text-align:center;padding:18px 16px 10px;font-family:'Martian Mono',monospace;font-size:10px;color:rgba(84,110,122,.6);letter-spacing:.5px;line-height:2.2}
+.footer a{color:rgba(0,230,118,.45);text-decoration:none;transition:color .2s}
+.footer a:hover{color:var(--g)}
+.footer-sep{opacity:.8;margin:0 6px;color:var(--txt2)}
+
+/* STEP NAV (team flow back) */
+.back-btn{display:flex;align-items:center;gap:6px;background:none;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 14px;color:var(--txt3);font-family:'Martian Mono',monospace;font-size:11px;cursor:pointer;transition:all .2s;letter-spacing:.5px}
+.back-btn:hover{border-color:rgba(255,255,255,.2);color:var(--txt)}
+
+/* OVERLAY MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;display:flex;align-items:flex-end;justify-content:center;animation:moIn .25s ease}
+@keyframes moIn{from{opacity:0}to{opacity:1}}
+.modal-box{background:var(--bg3);border:1px solid rgba(0,230,118,.2);border-radius:var(--radius) var(--radius) 0 0;padding:24px 18px 36px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;animation:mbIn .3s cubic-bezier(.4,0,.2,1)}
+@keyframes mbIn{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-title{font-family:'Unbounded',sans-serif;font-size:16px;font-weight:900;color:var(--g);letter-spacing:1px;margin-bottom:6px;text-align:center}
+.modal-sub{font-family:'Martian Mono',monospace;font-size:10px;color:var(--txt3);letter-spacing:1.5px;text-align:center;margin-bottom:20px}
+.modal-word-big{font-family:'Unbounded',sans-serif;font-size:clamp(28px,8vw,46px);font-weight:900;text-align:center;color:var(--y);text-shadow:0 0 30px rgba(255,234,0,.5);letter-spacing:1px;padding:20px 0 10px;animation:wGlow 2s ease-in-out infinite alternate}
+.modal-timer-row{display:flex;align-items:center;justify-content:center;gap:16px;margin:14px 0 18px}
+.modal-timer-num{font-family:'Unbounded',sans-serif;font-size:52px;font-weight:900;transition:color .3s}
+.modal-timer-label{font-family:'Martian Mono',monospace;font-size:10px;color:var(--txt3);letter-spacing:2px}
+.modal-close{margin-top:10px}
+
+/* Game result modal content */
+.result-player{font-family:'Unbounded',sans-serif;font-size:22px;font-weight:900;color:var(--g);text-align:center;margin-bottom:4px}
+.result-time{font-family:'Martian Mono',monospace;font-size:13px;color:var(--txt3);text-align:center;margin-bottom:18px;letter-spacing:1px}
+.result-win{font-size:52px;text-align:center;display:block;margin:10px 0;filter:drop-shadow(0 0 18px rgba(255,234,0,.5))}
+.result-timeout{color:var(--r);text-shadow:0 0 20px rgba(255,23,68,.4)}
+</style>
+</head>
+<body>
+<div id="particles" class="particle-canvas"></div>
+
+<div class="app">
+  <header class="header">
+    <span class="croc-glyph">🐊</span>
+    <h1 class="header-title">КРОКОДИЛ</h1>
+    <p class="header-sub">AI WORD GENERATOR · LLAMA 3.3 · 70B</p>
+  </header>
+
+  <div class="scroll-area" id="scrollArea">
+
+    <!-- ═══ PAGE: GENERATE (SOLO) ═══ -->
+    <div class="page active" id="pageGen">
+
+      <!-- MODE SELECT -->
+      <div class="card">
+        <div class="card-label"><span class="ld"></span>РЕЖИМ ИГРЫ</div>
+        <div class="mode-grid">
+          <button class="mode-btn mode-solo" onclick="startSoloFlow()">
+            <span class="mode-icon">🎯</span>
+            <span class="mode-name">СОЛО</span>
+            <span class="mode-desc">Генерируй слова<br>для своей игры</span>
+          </button>
+          <button class="mode-btn mode-team" onclick="goPage('team')">
+            <span class="mode-icon">👥</span>
+            <span class="mode-name">КОМАНДА</span>
+            <span class="mode-desc">Игра с друзьями,<br>таймер и рейтинг</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- API KEY -->
+      <div class="card" id="apiCard">
+        <div class="card-label"><span class="ld"></span>GROQ API</div>
+        <div id="apiKeyBlock"></div>
+      </div>
+
+      <!-- TOPICS -->
+      <div class="card">
+        <div class="card-label"><span class="ld" style="background:var(--y);box-shadow:0 0 10px var(--y)"></span>ТЕМЫ</div>
+        <div class="topic-scroll" id="topicGrid"></div>
+        <div class="custom-row">
+          <input class="custom-inp" type="text" id="customTopicInput" placeholder="Своя тема..." maxlength="35">
+          <button class="add-topic-btn" onclick="addCustomTopic()">+ ДОБАВИТЬ</button>
+        </div>
+        <div class="selected-meta" id="selectedMeta">Ничего не выбрано</div>
+      </div>
+
+      <!-- DIFFICULTY -->
+      <div class="card">
+        <div class="card-label"><span class="ld" style="background:var(--r);box-shadow:0 0 10px var(--r)"></span>СЛОЖНОСТЬ</div>
+        <div class="diff-grid">
+          <button class="diff-btn diff-easy-act" id="diffEasy" onclick="setDiff('easy')">
+            <span class="di">🟢</span><span>ЛЁГКАЯ</span><span style="font-size:11px;letter-spacing:2px">★☆☆</span>
+          </button>
+          <button class="diff-btn" id="diffMedium" onclick="setDiff('medium')">
+            <span class="di">🟡</span><span>СРЕДНЯЯ</span><span style="font-size:11px;letter-spacing:2px">★★☆</span>
+          </button>
+          <button class="diff-btn" id="diffHard" onclick="setDiff('hard')">
+            <span class="di">🔴</span><span>СЛОЖНАЯ</span><span style="font-size:11px;letter-spacing:2px">★★★</span>
+          </button>
+        </div>
+        <div class="diff-desc" id="diffDesc">Простые слова — животные, предметы. Легко показать руками 🤙</div>
+      </div>
+
+      <!-- COUNT -->
+      <div class="card">
+        <div class="card-label"><span class="ld" style="background:var(--b);box-shadow:0 0 10px var(--b)"></span>КОЛИЧЕСТВО СЛОВ</div>
+        <div class="count-row">
+          <span class="count-label">Сколько слов?</span>
+          <div class="count-ctrl">
+            <button class="ccb" onclick="changeCount(-1,this)">−</button>
+            <div class="count-val" id="countVal">10</div>
+            <button class="ccb" onclick="changeCount(1,this)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESULTS -->
+      <div id="resultsArea"></div>
+
+      <!-- FOOTER -->
+      <div class="footer">
+        Made by
+        <a href="https://github.com/ai-platon" target="_blank">Platon</a>
+        <span class="footer-sep">·</span>
+        <a href="https://github.com/oksana-kyrylchuk" target="_blank">Oksana</a>
+      </div>
+    </div>
+
+    <!-- ═══ PAGE: TEAM ═══ -->
+    <div class="page" id="pageTeam">
+      <!-- Step 1: Players -->
+      <div id="teamStep1">
+        <div class="card">
+          <button class="back-btn" onclick="goPage('gen')" style="margin-bottom:12px">← НАЗАД</button>
+          <div class="card-label"><span class="ld"></span>ИГРОКИ</div>
+          <div class="players-list" id="playersList"></div>
+          <button class="add-player-btn" onclick="addPlayerInput()" style="margin-top:8px">+ ДОБАВИТЬ ИГРОКА</button>
+        </div>
+
+        <!-- Topics for team -->
+        <div class="card">
+          <div class="card-label"><span class="ld" style="background:var(--y);box-shadow:0 0 10px var(--y)"></span>ТЕМА РАУНДА</div>
+          <div class="topic-scroll" id="teamTopicGrid"></div>
+          <div class="custom-row">
+            <input class="custom-inp" type="text" id="teamCustomTopicInput" placeholder="Своя тема..." maxlength="35">
+            <button class="add-topic-btn" onclick="addTeamCustomTopic()">+ ДОБАВИТЬ</button>
+          </div>
+          <div class="selected-meta" id="teamSelectedMeta">Ничего не выбрано</div>
+        </div>
+
+        <!-- Difficulty for team -->
+        <div class="card">
+          <div class="card-label"><span class="ld" style="background:var(--r);box-shadow:0 0 10px var(--r)"></span>СЛОЖНОСТЬ</div>
+          <div class="diff-grid">
+            <button class="diff-btn diff-easy-act" id="teamDiffEasy" onclick="setTeamDiff('easy')">
+              <span class="di">🟢</span><span>ЛЁГКАЯ</span><span style="font-size:11px;letter-spacing:2px">★☆☆</span>
+            </button>
+            <button class="diff-btn" id="teamDiffMedium" onclick="setTeamDiff('medium')">
+              <span class="di">🟡</span><span>СРЕДНЯЯ</span><span style="font-size:11px;letter-spacing:2px">★★☆</span>
+            </button>
+            <button class="diff-btn" id="teamDiffHard" onclick="setTeamDiff('hard')">
+              <span class="di">🔴</span><span>СЛОЖНАЯ</span><span style="font-size:11px;letter-spacing:2px">★★★</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Timer length -->
+        <div class="card">
+          <div class="card-label"><span class="ld" style="background:var(--b);box-shadow:0 0 10px var(--b)"></span>ВРЕМЯ НА ПОКАЗ</div>
+          <div class="count-row">
+            <span class="count-label">Секунд на слово</span>
+            <div class="count-ctrl">
+              <button class="ccb" onclick="changeTimerLen(-5,this)">−</button>
+              <div class="count-val" id="timerLenVal">60</div>
+              <button class="ccb" onclick="changeTimerLen(5,this)">+</button>
+            </div>
+          </div>
+        </div>
+
+        <button class="big-btn big-btn-green" onclick="startTeamGame()">
+          <span class="bico">🎮</span><span class="btxt">НАЧАТЬ ИГРУ</span>
+        </button>
+      </div>
+
+      <!-- Step 2: Active game (round) -->
+      <div id="teamGameArea" style="display:none">
+        <div class="game-screen" id="gameScreen"></div>
+      </div>
+
+      <!-- Step 3: Final scoreboard -->
+      <div id="teamFinalArea" style="display:none">
+        <div class="game-screen">
+          <div class="score-header">
+            <div class="score-title">🏆 РЕЗУЛЬТАТЫ</div>
+            <div class="score-sub" id="finalSubtitle"></div>
+          </div>
+          <div class="score-list" id="finalScoreList"></div>
+          <div class="score-actions">
+            <button class="big-btn big-btn-green" onclick="playAgain()"><span class="bico">🔄</span><span class="btxt">ЕЩЁ РАЗ</span></button>
+            <button class="big-btn big-btn-blue" onclick="goPage('gen')"><span class="bico">🏠</span><span class="btxt">В МЕНЮ</span></button>
+          </div>
+        </div>
+        <div class="footer">
+          Made by
+          <a href="https://github.com/ai-platon" target="_blank">Platon</a>
+          <span class="footer-sep">·</span>
+          <a href="https://github.com/oksana-kyrylchuk" target="_blank">Oksana</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PAGE: HISTORY ═══ -->
+    <div class="page" id="pageHist">
+      <div class="card">
+        <div class="card-label"><span class="ld"></span>ИСТОРИЯ ГЕНЕРАЦИЙ</div>
+        <div id="histContent"></div>
+      </div>
+      <div class="footer">
+        Made by
+        <a href="https://github.com/ai-platon" target="_blank">Platon</a>
+        <span class="footer-sep">·</span>
+        <a href="https://github.com/oksana-kyrylchuk" target="_blank">Oksana</a>
+      </div>
+    </div>
+
+    <!-- ═══ PAGE: LEADERBOARD ═══ -->
+    <div class="page" id="pageLb">
+      <div class="card">
+        <div class="card-label"><span class="ld" style="background:var(--y);box-shadow:0 0 10px var(--y)"></span>ЛИДЕРБОРД</div>
+        <div id="lbContent"></div>
+      </div>
+      <div class="footer">
+        Made by
+        <a href="https://github.com/ai-platon" target="_blank">Platon</a>
+        <span class="footer-sep">·</span>
+        <a href="https://github.com/oksana-kyrylchuk" target="_blank">Oksana</a>
+      </div>
+    </div>
+
+  </div><!-- /scroll-area -->
+
+  <!-- GENERATE BUTTON (solo only) -->
+  <div class="gen-btn-wrap" id="genBtnWrap">
+    <div class="gen-info" id="genInfo" style="display:none"></div>
+    <button class="gen-btn" id="genBtn" onclick="generate()">
+      <span class="gen-btn-ico">🐊</span>
+      <span class="gen-btn-txt">СГЕНЕРИРОВАТЬ СЛОВА</span>
+    </button>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="nav-tab active" id="tabGen" onclick="goPage('gen')">
+      <span class="nav-icon">🎲</span><span>ГЕНЕРАТОР</span>
+    </button>
+    <button class="nav-tab" id="tabTeam" onclick="goPage('team')">
+      <span class="nav-icon">👥</span><span>КОМАНДА</span>
+    </button>
+    <button class="nav-tab" id="tabHist" onclick="goPage('hist')">
+      <span class="nav-icon">📋</span><span>ИСТОРИЯ</span>
+      <span class="nav-badge" id="histBadge" style="display:none">0</span>
+    </button>
+    <button class="nav-tab" id="tabLb" onclick="goPage('lb')">
+      <span class="nav-icon">🏆</span><span>РЕЙТИНГ</span>
+    </button>
+  </nav>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════
+const ST = {
+  apiKey: '',
+  connected: false,
+  topics: new Set(),
+  diff: 'easy',
+  count: 10,
+};
+
+const TEAM = {
+  players: [],        // [{name, totalTime, rounds, bestTime}]
+  topics: new Set(),
+  diff: 'easy',
+  timerLen: 60,
+  words: [],          // fetched word list
+  currentPlayerIdx: 0,
+  currentWord: null,
+  round: 0,
+  maxRounds: 0,       // players.length (one full circle)
+  order: [],          // shuffled player order for this game
+  results: [],        // [{name, time, word, success}]
+  timerInterval: null,
+  timerSecondsLeft: 0,
+  phase: 'pick',      // 'pick' | 'timer' | 'done'
+  gameTopicKey: '',   // for leaderboard grouping
+};
+
+const DIFF_DESC = {
+  easy: 'Простые слова — животные, предметы. Легко показать руками 🤙',
+  medium: 'Средняя сложность — нужна фантазия и хитрость 🧠',
+  hard: 'Абстракции, редкие понятия — испытание для гениев 🔥',
+};
+
+const TOPICS_LIST = [
+  {id:'it',       icon:'💻',name:'IT / Технологии'},
+  {id:'cycling',  icon:'🚴',name:'Велоспорт'},
+  {id:'famous',   icon:'⭐',name:'Известные люди'},
+  {id:'hard',     icon:'🧠',name:'Сложные 120IQ+'},
+  {id:'animals',  icon:'🐾',name:'Животные'},
+  {id:'movies',   icon:'🎬',name:'Кино и сериалы'},
+  {id:'food',     icon:'🍕',name:'Еда'},
+  {id:'sport',    icon:'⚽',name:'Спорт'},
+  {id:'science',  icon:'🔬',name:'Наука'},
+  {id:'nature',   icon:'🌿',name:'Природа'},
+  {id:'jobs',     icon:'👷',name:'Профессии'},
+  {id:'music',    icon:'🎵',name:'Музыка'},
+  {id:'travel',   icon:'✈️',name:'Путешествия'},
+  {id:'history',  icon:'📜',name:'История'},
+  {id:'emotions', icon:'😂',name:'Эмоции'},
+  {id:'myth',     icon:'⚡',name:'Мифология'},
+];
+
+const PLAYER_EMOJIS = ['🦁','🐯','🦊','🐺','🦅','🐊','🦝','🐲','🦄','🐸','🦋','🎯'];
+
+let customTopics = [];
+let teamCustomTopics = [];
+let history = JSON.parse(localStorage.getItem('croc_history') || '[]');
+let leaderboard = JSON.parse(localStorage.getItem('croc_lb2') || '{}');
+let currentPage = 'gen';
+
+// ══════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════
+function init() {
+  loadApiKey();
+  buildTopics('topicGrid', ST.topics, 'solo');
+  buildTopics('teamTopicGrid', TEAM.topics, 'team');
+  initPlayerInputs();
+  renderHistory();
+  renderLeaderboard();
+  updateHistBadge();
+  document.getElementById('customTopicInput').addEventListener('keydown',e=>{if(e.key==='Enter')addCustomTopic()});
+  document.getElementById('teamCustomTopicInput').addEventListener('keydown',e=>{if(e.key==='Enter')addTeamCustomTopic()});
+}
+
+// ══════════════════════════════════════════════
+//  API KEY
+// ══════════════════════════════════════════════
+function loadApiKey() {
+  const key = localStorage.getItem('croc_api_key') || '';
+  if(key) { ST.apiKey = key; ST.connected = true; renderApiConnected(); }
+  else renderApiDisconnected();
+}
+
+function renderApiDisconnected() {
+  document.getElementById('apiKeyBlock').innerHTML = `
+    <div class="api-wrap">
+      <input class="api-input" type="password" id="apiKeyInput" placeholder="Вставьте ключ gsk_..." autocomplete="off">
+      <button class="api-btn" onclick="connectApi()">ВОЙТИ</button>
+    </div>
+    <div class="api-hint">
+      Бесплатно: <a href="https://console.groq.com/keys" target="_blank" style="color:var(--y);font-weight:700">Получить Groq API ключ →</a>
+    </div>`;
+  document.getElementById('apiKeyInput').addEventListener('keydown',e=>{if(e.key==='Enter')connectApi()});
+}
+
+function renderApiConnected() {
+  const masked = ST.apiKey.slice(0,7)+'···'+ST.apiKey.slice(-4);
+  document.getElementById('apiKeyBlock').innerHTML = `
+    <div class="api-connected">
+      <div class="api-conn-status"><span class="conn-dot"></span>CONNECTED · ${masked}</div>
+      <button class="api-disc-btn" onclick="disconnectApi()">СБРОС</button>
+    </div>
+    <div class="api-hint"><a href="https://console.groq.com/keys" target="_blank" style="color:var(--y);font-weight:700">Получить Groq API ключ →</a></div>`;
+}
+
+function connectApi() {
+  const val = document.getElementById('apiKeyInput').value.trim();
+  if(!val){showToast('❌ Введите API ключ');return;}
+  ST.apiKey = val; ST.connected = true;
+  localStorage.setItem('croc_api_key', val);
+  renderApiConnected();
+  showToast('🔐 Ключ сохранён');
+}
+
+function disconnectApi() {
+  ST.apiKey=''; ST.connected=false;
+  localStorage.removeItem('croc_api_key');
+  renderApiDisconnected();
+  showToast('🔓 Ключ удалён');
+}
+
+// ══════════════════════════════════════════════
+//  TOPICS
+// ══════════════════════════════════════════════
+function buildTopics(containerId, topicSet, mode) {
+  const grid = document.getElementById(containerId);
+  grid.innerHTML = TOPICS_LIST.map(t => `
+    <button class="topic-chip" data-id="${t.id}" onclick="toggleTopic('${t.id}',this,'${mode}')">
+      <span class="tc-i">${t.icon}</span>${t.name}
+    </button>`).join('');
+  updateSelectedMeta(topicSet, mode === 'solo' ? 'selectedMeta' : 'teamSelectedMeta');
+}
+
+function toggleTopic(id, el, mode) {
+  const set = mode === 'solo' ? ST.topics : TEAM.topics;
+  if(set.has(id)){set.delete(id);el.classList.remove('selected');}
+  else{set.add(id);el.classList.add('selected');}
+  updateSelectedMeta(set, mode==='solo'?'selectedMeta':'teamSelectedMeta');
+  vibrate(30);
+}
+
+function addCustomTopic() {
+  const inp = document.getElementById('customTopicInput');
+  const val = inp.value.trim(); if(!val)return;
+  const id = 'c_'+Date.now();
+  customTopics.push({id,name:val});
+  ST.topics.add(id);
+  addTopicChip('topicGrid', id, val, ST.topics, 'solo', 'selectedMeta');
+  inp.value=''; showToast('✅ Тема добавлена'); vibrate(40);
+}
+
+function addTeamCustomTopic() {
+  const inp = document.getElementById('teamCustomTopicInput');
+  const val = inp.value.trim(); if(!val)return;
+  const id = 'tc_'+Date.now();
+  teamCustomTopics.push({id,name:val});
+  TEAM.topics.add(id);
+  addTopicChip('teamTopicGrid', id, val, TEAM.topics, 'team', 'teamSelectedMeta');
+  inp.value=''; showToast('✅ Тема добавлена'); vibrate(40);
+}
+
+function addTopicChip(gridId, id, val, set, mode, metaId) {
+  const grid = document.getElementById(gridId);
+  const chip = document.createElement('button');
+  chip.className='topic-chip tc-custom selected';
+  chip.dataset.id=id;
+  chip.innerHTML=`<span class="tc-i">✏️</span>${val}`;
+  chip.onclick=()=>{
+    if(set.has(id)){set.delete(id);chip.classList.remove('selected');}
+    else{set.add(id);chip.classList.add('selected');}
+    updateSelectedMeta(set,metaId);
+  };
+  grid.appendChild(chip);
+  updateSelectedMeta(set,metaId);
+}
+
+function updateSelectedMeta(set, id) {
+  const el = document.getElementById(id); if(!el)return;
+  el.innerHTML = set.size===0 ? 'Ничего не выбрано' : `Выбрано тем: <strong>${set.size}</strong>`;
+}
+
+function getTopicLabels(set, customs) {
+  return [...set].map(id=>{
+    const k=TOPICS_LIST.find(t=>t.id===id);
+    if(k)return k.name;
+    const c=[...customTopics,...teamCustomTopics,...(customs||[])].find(t=>t.id===id);
+    return c?c.name:id;
+  });
+}
+
+// ══════════════════════════════════════════════
+//  DIFFICULTY
+// ══════════════════════════════════════════════
+function setDiff(d) {
+  ST.diff = d;
+  applyDiffBtns(['diffEasy','diffMedium','diffHard'], d);
+  document.getElementById('diffDesc').textContent = DIFF_DESC[d];
+  vibrate(25);
+}
+
+function setTeamDiff(d) {
+  TEAM.diff = d;
+  applyDiffBtns(['teamDiffEasy','teamDiffMedium','teamDiffHard'], d);
+  vibrate(25);
+}
+
+function applyDiffBtns(ids, active) {
+  const map = {0:'easy',1:'medium',2:'hard'};
+  const actCls = {easy:'diff-easy-act',medium:'diff-med-act',hard:'diff-hard-act'};
+  ids.forEach((id,i)=>{
+    const el=document.getElementById(id); if(!el)return;
+    el.className='diff-btn'+(map[i]===active?' '+actCls[map[i]]:'');
+  });
+}
+
+// ══════════════════════════════════════════════
+//  COUNT / TIMER LEN
+// ══════════════════════════════════════════════
+function changeCount(d, btn) {
+  ST.count = Math.max(3, Math.min(20, ST.count+d));
+  document.getElementById('countVal').textContent = ST.count;
+  if(btn) pulseCcb(btn);
+  vibrate(20);
+}
+
+function changeTimerLen(d, btn) {
+  TEAM.timerLen = Math.max(15, Math.min(180, TEAM.timerLen+d));
+  document.getElementById('timerLenVal').textContent = TEAM.timerLen;
+  if(btn) pulseCcb(btn);
+  vibrate(20);
+}
+
+// ══════════════════════════════════════════════
+//  GROQ API CALL
+// ══════════════════════════════════════════════
+async function fetchWords(topicLabels, diff, count, apiKey) {
+  const diffLabels = {
+    easy:'ЛЁГКАЯ (простые, бытовые, всем известные)',
+    medium:'СРЕДНЯЯ (нужна фантазия, небанальные)',
+    hard:'СЛОЖНАЯ (абстрактные, редкие, IQ 120+ — для показа жестами особенно сложные)',
+  };
+  const prompt = `Ты — генератор слов для игры «Крокодил». Один игрок молча показывает слово жестами, остальные угадывают.
+
+ЗАДАЧА: Сгенерируй ровно ${count} слов или коротких словосочетаний на РУССКОМ языке.
+ТЕМЫ: ${topicLabels.join(', ')}
+СЛОЖНОСТЬ: ${diffLabels[diff]}
+
+ПРАВИЛА:
+— Только существительные или прилагательное+существительное
+— Каждое слово/словосочетание — на отдельной строке
+— Никаких цифр, нумерации, тире в начале, пояснений — ТОЛЬКО слова
+— Слова должны быть интересными и разнообразными
+— Ответ ТОЛЬКО список слов, ничего больше`;
+
+  const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':`Bearer ${apiKey}`},
+    body:JSON.stringify({
+      model:'llama-3.3-70b-versatile',
+      max_tokens:700,
+      temperature:0.92,
+      top_p:0.95,
+      messages:[{role:'user',content:prompt}]
+    })
+  });
+  if(!resp.ok){const e=await resp.json().catch(()=>({}));throw new Error(e?.error?.message||`HTTP ${resp.status}`);}
+  const data = await resp.json();
+  const raw = data.choices?.[0]?.message?.content||'';
+  return raw.split('\n')
+    .map(l=>l.replace(/^[-–•*\d.)\s]+/,'').trim())
+    .filter(l=>l.length>1&&l.length<60&&/[а-яёА-ЯЁ]/.test(l))
+    .slice(0,count);
+}
+
+// ══════════════════════════════════════════════
+//  SOLO GENERATE
+// ══════════════════════════════════════════════
+function startSoloFlow() {
+  document.getElementById('scrollArea').scrollTo({top:document.getElementById('apiCard').offsetTop-70,behavior:'smooth'});
+}
+
+async function generate() {
+  if(!ST.connected||!ST.apiKey){showToast('❌ Нужен Groq API ключ');return;}
+  if(ST.topics.size===0){showToast('❌ Выберите хотя бы одну тему');return;}
+
+  const btn=document.getElementById('genBtn');
+  btn.disabled=true; btn.classList.add('loading');
+  btn.innerHTML='<span class="gen-btn-ico" style="animation:lC 1s infinite">🐊</span><span class="gen-btn-txt">ГЕНЕРИРУЮ...</span>';
+
+  const area=document.getElementById('resultsArea');
+  area.innerHTML=`<div class="card"><div class="loading-box">
+    <span class="loading-croc">🐊</span>
+    <div class="loading-text">ПРИДУМЫВАЮ СЛОВА...</div>
+    <div class="loading-dots"><span></span><span></span><span></span></div>
+  </div></div>`;
+
+  const topicLabels = getTopicLabels(ST.topics, customTopics);
+
+  try {
+    const words = await fetchWords(topicLabels, ST.diff, ST.count, ST.apiKey);
+    if(words.length===0)throw new Error('Модель вернула пустой ответ');
+    renderWords(words, topicLabels);
+    spawnParticles();
+    saveHistory(words, topicLabels);
+    vibrate([50,30,80]);
+  } catch(e) {
+    area.innerHTML=`<div class="card"><div class="error-box">❌ ${escHtml(e.message)}</div></div>`;
+  }
+
+  btn.disabled=false; btn.classList.remove('loading');
+  btn.innerHTML='<span class="gen-btn-ico">🐊</span><span class="gen-btn-txt">СГЕНЕРИРОВАТЬ СЛОВА</span>';
+}
+
+function renderWords(words, topicLabels) {
+  const diffColors={easy:'#00e676',medium:'#ffea00',hard:'#ff1744'};
+  const diffNames={easy:'ЛЁГКАЯ',medium:'СРЕДНЯЯ',hard:'СЛОЖНАЯ'};
+  const area=document.getElementById('resultsArea');
+  area.innerHTML=`<div class="results-card">
+    <div class="results-header">
+      <div>
+        <div class="res-title">✅ ${words.length} СЛОВ</div>
+        <div class="res-meta">${topicLabels.join(' · ')}</div>
+        <div class="res-meta" style="color:${diffColors[ST.diff]}">${diffNames[ST.diff]}</div>
+      </div>
+      <button class="copy-all-btn" onclick="copyAll()">📋 ВСЁ</button>
+    </div>
+    <div class="words-grid" id="wordGrid"></div>
+  </div>`;
+  const grid=document.getElementById('wordGrid');
+  words.forEach(w=>{
+    const c=document.createElement('div');
+    c.className='word-card';
+    c.innerHTML=`<span class="word-text">${w}</span><span class="word-copy-ico">📋</span>`;
+    c.onclick=()=>copyWord(w,c);
+    grid.appendChild(c);
+  });
+  setTimeout(()=>area.scrollIntoView({behavior:'smooth',block:'start'}),100);
+}
+
+function copyWord(word, el) {
+  navigator.clipboard.writeText(word).catch(()=>{});
+  el.classList.add('copied');
+  setTimeout(()=>el.classList.remove('copied'),1200);
+  showToast('📋 '+word); vibrate(40);
+}
+
+function copyAll() {
+  const items=document.querySelectorAll('.word-text');
+  const text=Array.from(items).map(i=>i.textContent).join('\n');
+  navigator.clipboard.writeText(text).catch(()=>{});
+  showToast('📋 Все '+items.length+' слов скопированы!'); vibrate([30,20,50]);
+}
+
+// ══════════════════════════════════════════════
+//  HISTORY
+// ══════════════════════════════════════════════
+function saveHistory(words, topicLabels) {
+  const entry={id:Date.now(),date:new Date().toLocaleString('ru',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}),topics:topicLabels,diff:ST.diff,words};
+  history.unshift(entry);
+  if(history.length>30)history.pop();
+  localStorage.setItem('croc_history',JSON.stringify(history));
+  renderHistory(); updateHistBadge();
+}
+
+function renderHistory() {
+  const cont=document.getElementById('histContent'); if(!cont)return;
+  updateHistBadge();
+  if(history.length===0){
+    cont.innerHTML=`<div class="hist-empty"><span class="hist-icon">📋</span>История пуста.<br>Генерируй слова,<br>они появятся здесь!</div>`;
+    return;
+  }
+  cont.innerHTML=history.map(e=>`
+    <div class="hist-entry">
+      <div class="hist-entry-header">
+        <div class="hist-entry-meta">${e.date}<br>${e.topics.join(' · ')}</div>
+        <div class="hdiff hdiff-${e.diff}">${{easy:'Лёгкая',medium:'Средняя',hard:'Сложная'}[e.diff]}</div>
+      </div>
+      <div class="hist-words">${e.words.map(w=>`<div class="hist-word-chip" onclick="copyWordPlain('${escHtml(w)}')">${escHtml(w)}</div>`).join('')}</div>
+    </div>`).join('')+
+  `<button class="hist-clear-btn" onclick="clearHistory()">🗑 Очистить историю</button>`;
+}
+
+function copyWordPlain(w){navigator.clipboard.writeText(w).catch(()=>{});showToast('📋 '+w);vibrate(30);}
+function clearHistory(){history=[];localStorage.removeItem('croc_history');renderHistory();showToast('🗑 Очищено');}
+function updateHistBadge(){
+  const b=document.getElementById('histBadge');if(!b)return;
+  if(history.length>0){b.style.display='';b.textContent=history.length>9?'9+':history.length;}
+  else b.style.display='none';
+}
+
+// ══════════════════════════════════════════════
+//  LEADERBOARD
+// ══════════════════════════════════════════════
+function saveToLeaderboard(playerName, timeMs, topicKey) {
+  if(!leaderboard[topicKey]) leaderboard[topicKey] = {};
+  const prev = leaderboard[topicKey][playerName];
+  if(!prev || timeMs < prev.best) {
+    leaderboard[topicKey][playerName] = {best: timeMs, count: (prev?.count||0)+1};
+  } else {
+    leaderboard[topicKey][playerName].count++;
+  }
+  localStorage.setItem('croc_lb2', JSON.stringify(leaderboard));
+  renderLeaderboard();
+}
+
+function renderLeaderboard() {
+  const cont = document.getElementById('lbContent'); if(!cont)return;
+  const keys = Object.keys(leaderboard);
+  if(keys.length===0){
+    cont.innerHTML=`<div class="lb-empty"><span class="lb-icon">🏆</span>Ещё нет игр.<br>Сыграй командную партию,<br>результаты появятся здесь!</div>`;
+    return;
+  }
+  cont.innerHTML = keys.map(topic=>{
+    const entries = Object.entries(leaderboard[topic])
+      .sort((a,b)=>a[1].best-b[1].best)
+      .slice(0,10);
+    const medals=['🥇','🥈','🥉'];
+    const rows = entries.map(([name,data],i)=>`
+      <div class="lb-row">
+        <div class="lb-rank">${medals[i]||('#'+(i+1))}</div>
+        <div style="flex:1">
+          <div class="lb-name">${escHtml(name)}</div>
+          <div class="lb-best-label">Игр: ${data.count}</div>
+        </div>
+        <div style="text-align:right">
+          <div class="lb-best">${(data.best/1000).toFixed(1)}с</div>
+          <div class="lb-best-label">лучшее время</div>
+        </div>
+      </div>`).join('');
+    return `<div class="lb-section">
+      <div class="lb-section-header">
+        <div class="lb-topic-name">📂 ${escHtml(topic)}</div>
+        <div class="lb-section-meta">${entries.length} игроков</div>
+      </div>
+      ${rows}
+    </div>`;
+  }).join('')+`<button class="lb-clear-btn" onclick="clearLeaderboard()">🗑 Очистить рейтинг</button>`;
+}
+
+function clearLeaderboard(){leaderboard={};localStorage.removeItem('croc_lb2');renderLeaderboard();showToast('🗑 Рейтинг очищен');}
+
+// ══════════════════════════════════════════════
+//  TEAM GAME SETUP
+// ══════════════════════════════════════════════
+function initPlayerInputs() {
+  const list = document.getElementById('playersList');
+  list.innerHTML='';
+  for(let i=0;i<3;i++) addPlayerInput();
+}
+
+function addPlayerInput() {
+  const list = document.getElementById('playersList');
+  const idx = list.children.length;
+  const row = document.createElement('div');
+  row.className='player-row';
+  row.innerHTML=`<input class="player-input" type="text" placeholder="Имя игрока ${idx+1}" maxlength="20">
+    <button class="del-player-btn" onclick="this.parentElement.remove()">✕</button>`;
+  list.appendChild(row);
+  row.querySelector('input').focus();
+  vibrate(20);
+}
+
+async function startTeamGame() {
+  const inputs = [...document.querySelectorAll('#playersList .player-input')];
+  const names = inputs.map(i=>i.value.trim()).filter(n=>n.length>0);
+  if(names.length<2){showToast('❌ Нужно минимум 2 игрока');return;}
+  if(TEAM.topics.size===0){showToast('❌ Выберите тему');return;}
+  if(!ST.connected||!ST.apiKey){showToast('❌ Нужен Groq API ключ');return;}
+
+  const topicLabels = getTopicLabels(TEAM.topics, teamCustomTopics);
+  TEAM.gameTopicKey = topicLabels.join(', ');
+
+  TEAM.players = names.map((n,i)=>({name:n,emoji:PLAYER_EMOJIS[i%PLAYER_EMOJIS.length],totalTime:0,rounds:0,bestTime:Infinity}));
+  TEAM.order = shuffle([...Array(names.length).keys()]);
+  TEAM.results = [];
+  TEAM.round = 0;
+  TEAM.maxRounds = names.length;
+  TEAM.words = [];
+
+  // show loading
+  document.getElementById('teamStep1').style.display='none';
+  document.getElementById('teamFinalArea').style.display='none';
+  document.getElementById('teamGameArea').style.display='block';
+  document.getElementById('gameScreen').innerHTML=`<div class="loading-box">
+    <span class="loading-croc">🐊</span>
+    <div class="loading-text">ПОДБИРАЮ СЛОВА...</div>
+    <div class="loading-dots"><span></span><span></span><span></span></div>
+  </div>`;
+
+  try {
+    const count = Math.max(names.length * 3, 15);
+    TEAM.words = await fetchWords(topicLabels, TEAM.diff, count, ST.apiKey);
+    if(TEAM.words.length===0)throw new Error('Пустой ответ от модели');
+    startNextRound();
+  } catch(e) {
+    document.getElementById('gameScreen').innerHTML=`<div style="padding:20px"><div class="error-box">❌ ${escHtml(e.message)}</div>
+      <button class="big-btn big-btn-green" style="margin-top:12px" onclick="showTeamSetup()"><span class="btxt">НАЗАД</span></button></div>`;
+  }
+}
+
+function startNextRound() {
+  if(TEAM.round >= TEAM.maxRounds) { showFinalResults(); return; }
+  const pidx = TEAM.order[TEAM.round];
+  TEAM.currentPlayerIdx = pidx;
+  const player = TEAM.players[pidx];
+  // Pick 4 words for this player to choose from
+  const pool = TEAM.words.splice(0, 4);
+  if(pool.length===0){ showFinalResults(); return; }
+  TEAM.currentWords = pool;
+  TEAM.currentWord = null;
+  TEAM.phase = 'pick';
+  renderPickPhase(player, pool);
+}
+
+function renderPickPhase(player, words) {
+  const gs = document.getElementById('gameScreen');
+  gs.innerHTML = `
+    <div class="gs-header">
+      <div class="gs-round-info">РАУНД ${TEAM.round+1} / ${TEAM.maxRounds}</div>
+      <div class="gs-player-name">${player.emoji} ${escHtml(player.name)}</div>
+    </div>
+    <div class="player-turn-card">
+      <span class="ptc-avatar">${player.emoji}</span>
+      <div class="ptc-label">ТВОЙ ХОД</div>
+      <div class="ptc-name">${escHtml(player.name)}</div>
+      <div class="ptc-sub">Выбери слово для показа</div>
+    </div>
+    <div class="words-picker" id="wordPicker">
+      ${words.map((w,i)=>`<button class="pick-word-btn" onclick="pickWord('${escHtml(w)}',${i})">${escHtml(w)}</button>`).join('')}
+    </div>
+    <div style="padding:12px 14px">
+      <button class="big-btn big-btn-yellow" id="startTimerBtn" style="opacity:.4;pointer-events:none" onclick="startTimer()">
+        <span class="bico">▶</span><span class="btxt">НАЧАТЬ ПОКАЗ</span>
+      </button>
+    </div>`;
+}
+
+function pickWord(word, idx) {
+  TEAM.currentWord = word;
+  TEAM.phase = 'picked';
+  document.querySelectorAll('.pick-word-btn').forEach((b,i)=>{
+    b.classList.toggle('chosen', i===idx);
+  });
+  const btn = document.getElementById('startTimerBtn');
+  btn.style.opacity='1'; btn.style.pointerEvents='auto';
+}
+
+function startTimer() {
+  if(!TEAM.currentWord){showToast('❌ Выбери слово');return;}
+  TEAM.phase = 'timer';
+  TEAM.timerSecondsLeft = TEAM.timerLen;
+  const startMs = Date.now();
+  renderTimerPhase(TEAM.players[TEAM.currentPlayerIdx], TEAM.currentWord);
+  TEAM.timerInterval = setInterval(()=>{
+    TEAM.timerSecondsLeft--;
+    updateTimerDisplay();
+    if(TEAM.timerSecondsLeft<=0){
+      clearInterval(TEAM.timerInterval);
+      endRound(null, Date.now()-startMs, true);
+    }
+  },1000);
+  // Store start time
+  TEAM._startMs = startMs;
+}
+
+function renderTimerPhase(player, word) {
+  const gs = document.getElementById('gameScreen');
+  gs.innerHTML = `
+    <div class="gs-header">
+      <div class="gs-round-info">РАУНД ${TEAM.round+1} / ${TEAM.maxRounds}</div>
+      <div class="gs-player-name">${player.emoji} ${escHtml(player.name)}</div>
+    </div>
+    <div class="word-reveal-wrap">
+      <div class="wr-label">ПОКАЖИ СЛОВО</div>
+      <div class="wr-word" id="currentWordDisplay">${escHtml(word)}</div>
+      <div class="wr-hint">Без слов, звуков и жестов буквы</div>
+    </div>
+    <div class="timer-section">
+      <div class="timer-ring-wrap">
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <circle class="timer-track" cx="60" cy="60" r="54"/>
+          <circle class="timer-fill" id="timerFill" cx="60" cy="60" r="54"/>
+        </svg>
+        <div class="timer-val" id="timerVal">${TEAM.timerLen}</div>
+      </div>
+      <div class="timer-label">СЕКУНД ОСТАЛОСЬ</div>
+      <div class="timer-actions">
+        <button class="timer-action-btn ta-done" onclick="onGuessed()">✅ УГАДАЛИ!</button>
+        <button class="timer-action-btn ta-skip" onclick="onSkip()">⏭ ПРОПУСТИТЬ</button>
+      </div>
+    </div>`;
+}
+
+function updateTimerDisplay() {
+  const valEl = document.getElementById('timerVal');
+  const fillEl = document.getElementById('timerFill');
+  if(!valEl||!fillEl)return;
+  const t = TEAM.timerSecondsLeft;
+  const frac = t / TEAM.timerLen;
+  const circ = 2 * Math.PI * 54;
+  fillEl.style.strokeDashoffset = circ * (1 - frac);
+  valEl.textContent = t;
+  if(t <= 10) { valEl.style.color='var(--r)'; fillEl.style.stroke='var(--r)'; }
+  else if(t <= 20) { valEl.style.color='var(--y)'; fillEl.style.stroke='var(--y)'; }
+  else { valEl.style.color='var(--g)'; fillEl.style.stroke='var(--g)'; }
+}
+
+function onGuessed() {
+  clearInterval(TEAM.timerInterval);
+  const elapsed = Date.now() - TEAM._startMs;
+  endRound(TEAM.currentWord, elapsed, false);
+}
+
+function onSkip() {
+  clearInterval(TEAM.timerInterval);
+  const elapsed = Date.now() - TEAM._startMs;
+  endRound(TEAM.currentWord, elapsed, false, true);
+}
+
+function endRound(word, elapsedMs, timeout, skipped=false) {
+  const player = TEAM.players[TEAM.currentPlayerIdx];
+  const success = !timeout && !skipped;
+  if(success) {
+    player.totalTime += elapsedMs;
+    player.rounds++;
+    if(elapsedMs < player.bestTime) player.bestTime = elapsedMs;
+    saveToLeaderboard(player.name, elapsedMs, TEAM.gameTopicKey);
+  }
+  TEAM.results.push({name:player.name, emoji:player.emoji, time:elapsedMs, word: word||TEAM.currentWord, success, timeout, skipped});
+  TEAM.round++;
+  showRoundResult(player, elapsedMs, success, timeout, skipped, word||TEAM.currentWord);
+}
+
+function showRoundResult(player, ms, success, timeout, skipped, word) {
+  const overlay = document.createElement('div');
+  overlay.className='modal-overlay';
+  const timeStr = (ms/1000).toFixed(1)+'с';
+  const icon = timeout ? '⏰' : skipped ? '⏭' : '🎉';
+  const label = timeout ? 'ВРЕМЯ ВЫШЛО' : skipped ? 'ПРОПУСТИЛ' : 'УГАДАЛИ!';
+  const nextName = TEAM.round < TEAM.maxRounds ? TEAM.players[TEAM.order[TEAM.round]]?.name : null;
+  overlay.innerHTML=`<div class="modal-box">
+    <div style="text-align:center;padding-bottom:8px">
+      <span class="result-win${timeout?' result-timeout':''}">${icon}</span>
+      <div class="result-player">${escHtml(player.name)}</div>
+      <div class="result-time">${label} · ${timeStr}</div>
+      <div class="res-meta" style="margin-top:4px">Слово: <strong style="color:var(--y)">${escHtml(word)}</strong></div>
+    </div>
+    ${nextName?`<div style="text-align:center;margin:14px 0;font-family:'Martian Mono',monospace;font-size:11px;color:var(--txt3);letter-spacing:1.5px">СЛЕДУЮЩИЙ:</div>
+    <div style="text-align:center;font-family:'Unbounded',sans-serif;font-size:18px;font-weight:900;color:var(--b);margin-bottom:18px">${escHtml(nextName)}</div>`:''}
+    <button class="big-btn big-btn-${TEAM.round>=TEAM.maxRounds?'yellow':'green'} modal-close" onclick="closeRoundModal(this)">
+      <span class="bico">${TEAM.round>=TEAM.maxRounds?'🏆':'▶'}</span>
+      <span class="btxt">${TEAM.round>=TEAM.maxRounds?'ИТОГИ':'СЛЕДУЮЩИЙ'}</span>
+    </button>
+  </div>`;
+  document.body.appendChild(overlay);
+  vibrate([60,30,60]);
+}
+
+function closeRoundModal(btn) {
+  btn.closest('.modal-overlay').remove();
+  startNextRound();
+}
+
+// ══════════════════════════════════════════════
+//  FINAL RESULTS
+// ══════════════════════════════════════════════
+function showFinalResults() {
+  document.getElementById('teamGameArea').style.display='none';
+  document.getElementById('teamFinalArea').style.display='block';
+
+  // sort by time ascending (only those who succeeded)
+  const successful = TEAM.results.filter(r=>r.success).sort((a,b)=>a.time-b.time);
+  const failed = TEAM.results.filter(r=>!r.success);
+  const all = [...successful, ...failed];
+
+  document.getElementById('finalSubtitle').textContent = `${TEAM.gameTopicKey} · ${TEAM.results.length} раундов`;
+
+  const medals=['🥇','🥈','🥉'];
+  const list = document.getElementById('finalScoreList');
+  list.innerHTML = all.map((r,i)=>`
+    <div class="score-entry${i===0&&r.success?' is-current':''}">
+      <div class="score-rank">${r.success?(medals[i]||('#'+(i+1))):'❌'}</div>
+      <div class="score-info">
+        <div class="score-name">${r.emoji} ${escHtml(r.name)}</div>
+        <div class="score-stats">Слово: ${escHtml(r.word)}</div>
+      </div>
+      <div class="score-time">${r.success?(r.time/1000).toFixed(1)+'с':(r.timeout?'Время!':'Пропуск')}</div>
+    </div>`).join('');
+
+  spawnParticles();
+  document.getElementById('scrollArea').scrollTo({top:0,behavior:'smooth'});
+}
+
+function showTeamSetup() {
+  clearInterval(TEAM.timerInterval);
+  document.getElementById('teamGameArea').style.display='none';
+  document.getElementById('teamFinalArea').style.display='none';
+  document.getElementById('teamStep1').style.display='block';
+}
+
+function playAgain() { showTeamSetup(); }
+
+// ══════════════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════════════
+function goPage(page) {
+  currentPage = page;
+  const genBtn = document.getElementById('genBtnWrap');
+  ['gen','team','hist','lb'].forEach(p=>{
+    const pg = document.getElementById('page'+p.charAt(0).toUpperCase()+p.slice(1));
+    const tb = document.getElementById('tab'+p.charAt(0).toUpperCase()+p.slice(1));
+    if(pg) pg.classList.toggle('active',p===page);
+    if(tb) tb.classList.toggle('active',p===page);
+  });
+  genBtn.style.display = page==='gen' ? '' : 'none';
+  document.getElementById('scrollArea').scrollTo(0,0);
+  if(page==='hist') renderHistory();
+  if(page==='lb') renderLeaderboard();
+  if(page==='team') {
+    // reset to step1 if not in active game
+    if(document.getElementById('teamGameArea').style.display==='none' &&
+       document.getElementById('teamFinalArea').style.display==='none') {
+      document.getElementById('teamStep1').style.display='block';
+    }
+  }
+}
+
+// ══════════════════════════════════════════════
+//  PARTICLES
+// ══════════════════════════════════════════════
+function spawnParticles() {
+  const cont=document.getElementById('particles');
+  const colors=['#00e676','#69f0ae','#ffea00','#00b0ff','#ff1744'];
+  for(let i=0;i<32;i++){
+    const p=document.createElement('div');
+    p.className='particle';
+    const size=Math.random()*8+3;
+    const dx=(Math.random()-.5)*130;
+    const color=colors[Math.floor(Math.random()*colors.length)];
+    p.style.cssText=`left:${Math.random()*100}%;bottom:80px;width:${size}px;height:${size}px;background:${color};--dx:${dx}px;animation-duration:${Math.random()*1.5+.8}s;animation-delay:${Math.random()*.4}s;box-shadow:0 0 ${size*2}px ${color}`;
+    cont.appendChild(p);
+    setTimeout(()=>p.remove(),2400);
+  }
+}
+
+// ══════════════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════════════
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2000);
+}
+
+function vibrate(pattern) {
+  try{navigator.vibrate&&navigator.vibrate(pattern);}catch(e){}
+}
+
+function pulseCcb(el){el.classList.remove('pulse');void el.offsetWidth;el.classList.add('pulse');setTimeout(()=>el.classList.remove('pulse'),500)}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function shuffle(arr) {
+  for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}
+  return arr;
+}
+
+init();
+</script>
+</body>
+</html>
