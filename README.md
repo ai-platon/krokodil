@@ -1,14 +1,18 @@
 # 🐊 Krokodil: AI Word Generator
 
-> A browser party game — generate charades words for any topic using AI, play solo or with friends in real-time team mode
+> A party charades game powered by AI — available as a **web app** and a **native Android APK**
 
-![HTML](https://img.shields.io/badge/HTML-Single%20File-orange?logo=html5&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-Vanilla-yellow?logo=javascript&logoColor=black)
-![Groq](https://img.shields.io/badge/Groq-Llama--3.3--70b-orange)
-![License](https://img.shields.io/badge/license-MIT-green)
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-ai--platon.github.io-00d4ff?logo=github&logoColor=white)](https://ai-platon.github.io/krokodil/)
+<p>
+  <img src="https://img.shields.io/badge/HTML-Single%20File-orange?logo=html5&logoColor=white"/>
+  <img src="https://img.shields.io/badge/JavaScript-Vanilla-yellow?logo=javascript&logoColor=black"/>
+  <img src="https://img.shields.io/badge/Android-APK-3DDC84?logo=android&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Groq-Llama--3.3--70b-orange"/>
+  <img src="https://img.shields.io/badge/license-MIT-green"/>
+  <a href="https://ai-platon.github.io/krokodil/"><img src="https://img.shields.io/badge/Live%20Demo-ai--platon.github.io-00d4ff?logo=github&logoColor=white"/></a>
+</p>
 
-> 🎮 **[Play it live → ai-platon.github.io/krokodil](https://ai-platon.github.io/krokodil/)** — no installation needed
+> 🌐 **[Play in browser → ai-platon.github.io/krokodil](https://ai-platon.github.io/krokodil/)** — no installation needed
+> 📱 **[Download Android APK](https://github.com/ai-platon/krokodil/releases)** — install directly on any Android device
 
 ---
 
@@ -41,13 +45,30 @@
 | 🎨 **Neon UI** | Animated dark interface with glowing accents and particle effects |
 | 💾 **API key memory** | Your Groq key is saved in `localStorage` — no re-entry needed |
 | 📱 **Mobile ready** | Full responsive layout with native bottom tab navigation |
+| 🤖 **Android APK** | Packaged as a native Android app via Android Studio — install and play offline |
+
+---
+
+## 📦 How to Get It
+
+### 🌐 Web (no install)
+Open directly in any browser — works on desktop and mobile:
+**[ai-platon.github.io/krokodil](https://ai-platon.github.io/krokodil/)**
+
+### 📱 Android APK
+1. Download `krokodil.apk` from the [Releases page](https://github.com/ai-platon/krokodil/releases)
+2. On your Android device, go to **Settings → Install unknown apps** and allow your browser or file manager
+3. Open the `.apk` file and tap **Install**
+4. Launch **Krokodil** from your home screen — no browser needed
+
+> 💡 The APK wraps the same web app in a native Android shell via WebView. All features work identically.
 
 ---
 
 ## 🎮 How to Play
 
 ### Solo
-1. Open the HTML file in any modern browser
+1. Open the app (web or APK)
 2. Enter your **Groq API key** in the sidebar — it will be saved automatically
 3. Choose a **topic** (or type a custom one)
 4. Set **difficulty** and **word count**
@@ -72,9 +93,9 @@ You can also type **any custom topic** — the AI will generate relevant words i
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start (Web / Development)
 
-### 1. Download the file
+### 1. Clone the repo
 
 ```bash
 git clone https://github.com/ai-platon/krokodil.git
@@ -85,18 +106,18 @@ Or just download `krokodil.html` directly.
 
 ### 2. Get a free Groq API key
 
-Go to [console.groq.com/keys](https://console.groq.com/keys) and create a key.  
+Go to [console.groq.com/keys](https://console.groq.com/keys) and create a key.
 > 💡 Groq is free and extremely fast — words are generated in under 2 seconds.
 
 ### 3. Open the game
 
-Simply open `krokodil.html` in any modern browser — no server, no install needed.
+Open `krokodil.html` in any modern browser — no server, no install needed.
 
 ---
 
-## 📱 Mobile
+## 📱 Mobile Interface
 
-The game is fully playable on any phone — no app needed, just open the file in your browser.
+The game is fully playable on any phone — as a browser page or as the Android APK.
 
 The interface uses a bottom tab bar:
 
@@ -111,10 +132,13 @@ The interface uses a bottom tab bar:
 
 ## ⚙️ Tech Stack
 
-- **Frontend:** Pure HTML + CSS + Vanilla JS
-- **AI:** [Groq API](https://groq.com) — Llama 3.3 70b Versatile
-- **Storage:** Browser `localStorage` for API key, history, and leaderboard
-- **Fonts:** Unbounded, Martian Mono, Mulish (Google Fonts)
+| Layer | Technology |
+|---|---|
+| **Frontend** | Pure HTML + CSS + Vanilla JS |
+| **AI** | [Groq API](https://groq.com) — Llama 3.3 70b Versatile |
+| **Storage** | Browser `localStorage` — API key, history, leaderboard |
+| **Fonts** | Unbounded, Martian Mono, Mulish (Google Fonts) |
+| **Android** | Android Studio — WebView-based APK, `krokodil.apk` |
 
 ---
 
@@ -122,24 +146,25 @@ The interface uses a bottom tab bar:
 
 ```
 krokodil/
-└── krokodil.html    # The entire game — self-contained, single file
+├── krokodil.html       # The entire web game — self-contained, single file
+└── krokodil.apk        # Android APK — built with Android Studio
 ```
 
-No dependencies. No build step. No server. Just open and play.
+No dependencies. No build step for the web version. Just open and play.
 
 ---
 
 ## 🔒 Security & Privacy
 
 - Your API key is stored **only in your browser's localStorage** — it never touches any third-party server
-- All AI calls go **directly from your browser to Groq's API**
+- All AI calls go **directly from your browser (or the APK's WebView) to Groq's API**
 - To remove your saved key, click **🗑 Disconnect** in the API section
 
 ---
 
 ## 🤖 Model
 
-This game uses **Llama 3.3 70b Versatile** via [Groq](https://groq.com).  
+This game uses **Llama 3.3 70b Versatile** via [Groq](https://groq.com).
 Groq provides extremely fast inference — word sets typically appear in **under 2 seconds**.
 
 ---
@@ -152,4 +177,4 @@ MIT License — feel free to use, modify, and share.
 
 ## 👤 Authors
 
-Made by [Platon](https://github.com/ai-platon) & [Oksana](https://github.com/oksana-kyrylchuk)
+Made by [Platon](https://github.com/ai-platon)
