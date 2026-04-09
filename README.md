@@ -12,6 +12,7 @@
 </p>
 
 > 🌐 **[Play in browser → ai-platon.github.io/krokodil](https://ai-platon.github.io/krokodil/)** — no installation needed
+> 
 > 📱 **[Download Android APK](https://github.com/ai-platon/krokodil/releases)** — install directly on any Android device
 
 ---
