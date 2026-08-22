@@ -87,6 +87,9 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 @keyframes iW{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
 .topic-chip.tc-custom{border-style:dashed;border-color:rgba(255,234,0,.25);color:var(--y2)}
 .topic-chip.tc-custom.selected{border-color:var(--y);background:rgba(255,234,0,.08);color:var(--y)}
+.topic-chip.tc-all{flex:0 0 100%;justify-content:center;padding:10px 13px;border-color:rgba(0,176,255,.28);background:rgba(0,176,255,.05);color:var(--b2);font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;margin-bottom:3px}
+.topic-chip.tc-all.selected{border-color:var(--b);background:rgba(0,176,255,.12);color:var(--b2);box-shadow:0 0 14px rgba(0,176,255,.12)}
+.topic-chip.tc-all .tc-i{font-size:15px}
 .custom-row{display:flex;gap:8px;margin-top:10px}
 .custom-inp{flex:1;background:rgba(0,0,0,.3);border:1.5px solid rgba(255,255,255,.1);border-radius:var(--radius-sm);padding:11px 14px;color:var(--txt);font-family:'Mulish',sans-serif;font-size:13px;font-weight:500;outline:none;transition:border-color .2s}
 .custom-inp:focus{border-color:rgba(255,234,0,.4)}
@@ -269,6 +272,9 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .btxt{position:relative;z-index:1;pointer-events:none}
 .bico{font-size:22px;position:relative;z-index:1;pointer-events:none}
 
+/* team flow areas: same rhythm as the solo page (.page gap) */
+#teamStep1,#teamGameArea,#teamFinalArea{display:flex;flex-direction:column;gap:14px}
+
 /* ── GAME SCREEN ── */
 .game-screen{background:var(--panel);border-radius:var(--radius);overflow:hidden;border:1px solid rgba(0,230,118,.15)}
 .gs-header{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(0,0,0,.2)}
@@ -282,6 +288,13 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .ptc-label{font-family:'Martian Mono',monospace;font-size:10px;color:var(--txt3);letter-spacing:2px;margin-bottom:4px}
 .ptc-name{font-family:'Unbounded',sans-serif;font-size:22px;font-weight:900;color:var(--g);letter-spacing:1px;text-shadow:0 0 24px rgba(0,230,118,.5)}
 .ptc-sub{font-size:13px;color:var(--txt2);margin-top:6px;font-weight:500}
+
+/* Handoff card: "pass the phone" gate before words are revealed */
+.handoff-card{padding:30px 20px 26px;text-align:center;border-bottom:1px solid rgba(255,255,255,.06)}
+.ho-label{font-family:'Martian Mono',monospace;font-size:10px;color:var(--txt3);letter-spacing:2.5px;margin-bottom:14px}
+.ho-avatar{font-size:62px;display:block;margin-bottom:10px;animation:cF 2.5s ease-in-out infinite;filter:drop-shadow(0 0 18px rgba(0,176,255,.45))}
+.ho-name{font-family:'Unbounded',sans-serif;font-size:clamp(20px,6.5vw,28px);font-weight:900;color:var(--b2);letter-spacing:1px;text-shadow:0 0 26px rgba(0,176,255,.5);word-break:break-word}
+.ho-warn{font-family:'Martian Mono',monospace;font-size:10px;color:var(--txt3);letter-spacing:.5px;line-height:2;margin-top:18px}
 
 /* Word reveal */
 .word-reveal-wrap{padding:20px 16px;text-align:center;border-bottom:1px solid rgba(255,255,255,.06)}
@@ -556,6 +569,8 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       <div class="footer">
         Made by
         <a href="https://github.com/ai-platon" target="_blank">Platon</a>
+        <span class="footer-sep">·</span>
+        <a href="https://github.com/oksana-kyrylchuk" target="_blank">Oksana</a>
       </div>
     </div>
 
@@ -661,8 +676,22 @@ const TOPICS_LIST = [
 
 const PLAYER_EMOJIS = ['🦁','🐯','🦊','🐺','🦅','🐊','🦝','🐲','🦄','🐸','🦋','🎯'];
 
+// Groq регулярно выводит модели из эксплуатации, поэтому вместо хардкода
+// берём список доступных ключу моделей и выбираем первую из этого списка.
+const MODEL_CANDIDATES = [
+  'openai/gpt-oss-120b',
+  'moonshotai/kimi-k2-instruct',
+  'qwen/qwen3.6-27b',
+  'openai/gpt-oss-20b',
+  'llama-3.3-70b-versatile',
+  'meta-llama/llama-4-maverick-17b-128e-instruct',
+  'llama-3.1-8b-instant',
+];
+const MODEL_EXCLUDE = /whisper|tts|guard|embed|vision|distil|orpheus|playai|moderation/i;
+
 let customTopics = [];
 let teamCustomTopics = [];
+let resolvedModel = localStorage.getItem('croc_model') || '';
 let history = JSON.parse(localStorage.getItem('croc_history') || '[]');
 let leaderboard = JSON.parse(localStorage.getItem('croc_lb2') || '{}');
 let currentPage = 'gen';
@@ -672,6 +701,7 @@ let currentPage = 'gen';
 // ══════════════════════════════════════════════
 function init() {
   loadApiKey();
+  updateModelLabel();
   buildTopics('topicGrid', ST.topics, 'solo');
   buildTopics('teamTopicGrid', TEAM.topics, 'team');
   initPlayerInputs();
@@ -718,6 +748,8 @@ function connectApi() {
   if(!val){showToast('❌ Введите API ключ');return;}
   ST.apiKey = val; ST.connected = true;
   localStorage.setItem('croc_api_key', val);
+  // у нового ключа может быть другой набор моделей
+  resolvedModel=''; localStorage.removeItem('croc_model'); updateModelLabel();
   renderApiConnected();
   showToast('🔐 Ключ сохранён');
 }
@@ -725,6 +757,7 @@ function connectApi() {
 function disconnectApi() {
   ST.apiKey=''; ST.connected=false;
   localStorage.removeItem('croc_api_key');
+  resolvedModel=''; localStorage.removeItem('croc_model'); updateModelLabel();
   renderApiDisconnected();
   showToast('🔓 Ключ удалён');
 }
@@ -732,21 +765,53 @@ function disconnectApi() {
 // ══════════════════════════════════════════════
 //  TOPICS
 // ══════════════════════════════════════════════
+const gridIdFor = mode => mode==='solo' ? 'topicGrid' : 'teamTopicGrid';
+const metaIdFor = mode => mode==='solo' ? 'selectedMeta' : 'teamSelectedMeta';
+
 function buildTopics(containerId, topicSet, mode) {
   const grid = document.getElementById(containerId);
-  grid.innerHTML = TOPICS_LIST.map(t => `
+  grid.innerHTML = `
+    <button class="topic-chip tc-all" onclick="toggleAllTopics('${mode}')">
+      <span class="tc-i">✨</span><span class="tc-all-txt">ВСЕ ТЕМЫ</span>
+    </button>` + TOPICS_LIST.map(t => `
     <button class="topic-chip" data-id="${t.id}" onclick="toggleTopic('${t.id}',this,'${mode}')">
       <span class="tc-i">${t.icon}</span>${t.name}
     </button>`).join('');
-  updateSelectedMeta(topicSet, mode === 'solo' ? 'selectedMeta' : 'teamSelectedMeta');
+  syncAllChip(mode);
+  updateSelectedMeta(topicSet, metaIdFor(mode));
 }
 
 function toggleTopic(id, el, mode) {
   const set = mode === 'solo' ? ST.topics : TEAM.topics;
   if(set.has(id)){set.delete(id);el.classList.remove('selected');}
   else{set.add(id);el.classList.add('selected');}
-  updateSelectedMeta(set, mode==='solo'?'selectedMeta':'teamSelectedMeta');
+  syncAllChip(mode);
+  updateSelectedMeta(set, metaIdFor(mode));
   vibrate(30);
+}
+
+function toggleAllTopics(mode) {
+  const set = mode === 'solo' ? ST.topics : TEAM.topics;
+  const chips = [...document.querySelectorAll('#'+gridIdFor(mode)+' .topic-chip[data-id]')];
+  if(chips.length===0)return;
+  const selectAll = chips.some(c=>!c.classList.contains('selected'));
+  chips.forEach(c=>{
+    if(selectAll){set.add(c.dataset.id);c.classList.add('selected');}
+    else{set.delete(c.dataset.id);c.classList.remove('selected');}
+  });
+  syncAllChip(mode);
+  updateSelectedMeta(set, metaIdFor(mode));
+  showToast(selectAll ? '✨ Выбраны все темы' : '✖️ Темы сброшены');
+  vibrate(40);
+}
+
+function syncAllChip(mode) {
+  const grid = document.getElementById(gridIdFor(mode)); if(!grid)return;
+  const allChip = grid.querySelector('.tc-all'); if(!allChip)return;
+  const chips = [...grid.querySelectorAll('.topic-chip[data-id]')];
+  const on = chips.length>0 && chips.every(c=>c.classList.contains('selected'));
+  allChip.classList.toggle('selected', on);
+  allChip.querySelector('.tc-all-txt').textContent = on ? 'СНЯТЬ ВСЕ' : 'ВСЕ ТЕМЫ';
 }
 
 function addCustomTopic() {
@@ -774,13 +839,15 @@ function addTopicChip(gridId, id, val, set, mode, metaId) {
   const chip = document.createElement('button');
   chip.className='topic-chip tc-custom selected';
   chip.dataset.id=id;
-  chip.innerHTML=`<span class="tc-i">✏️</span>${val}`;
+  chip.innerHTML=`<span class="tc-i">✏️</span>${escHtml(val)}`;
   chip.onclick=()=>{
     if(set.has(id)){set.delete(id);chip.classList.remove('selected');}
     else{set.add(id);chip.classList.add('selected');}
+    syncAllChip(mode);
     updateSelectedMeta(set,metaId);
   };
   grid.appendChild(chip);
+  syncAllChip(mode);
   updateSelectedMeta(set,metaId);
 }
 
@@ -843,6 +910,51 @@ function changeTimerLen(d, btn) {
 // ══════════════════════════════════════════════
 //  GROQ API CALL
 // ══════════════════════════════════════════════
+async function resolveModel(apiKey, force) {
+  if(resolvedModel && !force) return resolvedModel;
+  const resp = await fetch('https://api.groq.com/openai/v1/models', {
+    headers:{'Authorization':`Bearer ${apiKey}`}
+  });
+  if(!resp.ok){const e=await resp.json().catch(()=>({}));throw new Error(e?.error?.message||`Не удалось получить список моделей (HTTP ${resp.status})`);}
+  const data = await resp.json();
+  const ids = (data.data||[])
+    .filter(m=>m.active!==false)
+    .map(m=>m.id)
+    .filter(id=>!MODEL_EXCLUDE.test(id));
+  const pick = MODEL_CANDIDATES.find(c=>ids.includes(c)) || ids[0];
+  if(!pick) throw new Error('Для этого ключа нет доступных моделей');
+  resolvedModel = pick;
+  localStorage.setItem('croc_model', pick);
+  updateModelLabel();
+  return pick;
+}
+
+function chatCompletion(model, prompt, apiKey) {
+  const body = {
+    model,
+    // Reasoning-модели (gpt-oss и др.) тратят часть бюджета на «размышления»,
+    // и они считаются в max_tokens. При тесном лимите ответ обрывается
+    // с finish_reason:'length', а content приходит пустым.
+    max_tokens:4000,
+    temperature:0.92,
+    top_p:0.95,
+    messages:[{role:'user',content:prompt}]
+  };
+  if(/gpt-oss/.test(model)) body.reasoning_effort = 'low';
+  return fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':`Bearer ${apiKey}`},
+    body:JSON.stringify(body)
+  });
+}
+
+function updateModelLabel() {
+  const el = document.querySelector('.header-sub'); if(!el)return;
+  el.textContent = resolvedModel
+    ? 'AI WORD GENERATOR · ' + resolvedModel.split('/').pop().toUpperCase()
+    : 'AI WORD GENERATOR · GROQ';
+}
+
 async function fetchWords(topicLabels, diff, count, apiKey) {
   const diffLabels = {
     easy:'ЛЁГКАЯ (простые, бытовые, всем известные)',
@@ -862,24 +974,24 @@ async function fetchWords(topicLabels, diff, count, apiKey) {
 — Слова должны быть интересными и разнообразными
 — Ответ ТОЛЬКО список слов, ничего больше`;
 
-  const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-    method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':`Bearer ${apiKey}`},
-    body:JSON.stringify({
-      model:'llama-3.3-70b-versatile',
-      max_tokens:700,
-      temperature:0.92,
-      top_p:0.95,
-      messages:[{role:'user',content:prompt}]
-    })
-  });
+  let model = await resolveModel(apiKey);
+  let resp = await chatCompletion(model, prompt, apiKey);
+  // Модель могли отключить уже после того, как мы её закешировали — перевыбираем и пробуем ещё раз.
+  if(!resp.ok && (resp.status===404 || resp.status===400)) {
+    const fresh = await resolveModel(apiKey, true);
+    if(fresh !== model) resp = await chatCompletion(fresh, prompt, apiKey);
+  }
   if(!resp.ok){const e=await resp.json().catch(()=>({}));throw new Error(e?.error?.message||`HTTP ${resp.status}`);}
   const data = await resp.json();
-  const raw = data.choices?.[0]?.message?.content||'';
-  return raw.split('\n')
+  const choice = data.choices?.[0];
+  const raw = choice?.message?.content||'';
+  const words = raw.split('\n')
     .map(l=>l.replace(/^[-–•*\d.)\s]+/,'').trim())
     .filter(l=>l.length>1&&l.length<60&&/[а-яёА-ЯЁ]/.test(l))
     .slice(0,count);
+  if(words.length===0 && choice?.finish_reason==='length')
+    throw new Error('Модель не уложилась в лимит ответа. Попробуйте ещё раз или уменьшите число слов.');
+  return words;
 }
 
 // ══════════════════════════════════════════════
@@ -1090,7 +1202,7 @@ async function startTeamGame() {
   // show loading
   document.getElementById('teamStep1').style.display='none';
   document.getElementById('teamFinalArea').style.display='none';
-  document.getElementById('teamGameArea').style.display='block';
+  document.getElementById('teamGameArea').style.display='flex';
   document.getElementById('gameScreen').innerHTML=`<div class="loading-box">
     <span class="loading-croc">🐊</span>
     <div class="loading-text">ПОДБИРАЮ СЛОВА...</div>
@@ -1098,7 +1210,8 @@ async function startTeamGame() {
   </div>`;
 
   try {
-    const count = Math.max(names.length * 3, 15);
+    // на каждый раунд игроку показываем 4 слова на выбор
+    const count = Math.max(names.length * 4, 16);
     TEAM.words = await fetchWords(topicLabels, TEAM.diff, count, ST.apiKey);
     if(TEAM.words.length===0)throw new Error('Пустой ответ от модели');
     startNextRound();
@@ -1118,8 +1231,36 @@ function startNextRound() {
   if(pool.length===0){ showFinalResults(); return; }
   TEAM.currentWords = pool;
   TEAM.currentWord = null;
+  // Сначала — экран передачи телефона, слова показываем только по нажатию нового игрока,
+  // чтобы предыдущий не увидел их у себя на экране.
+  TEAM.phase = 'handoff';
+  renderHandoffPhase(player);
+}
+
+function renderHandoffPhase(player) {
+  const gs = document.getElementById('gameScreen');
+  gs.innerHTML = `
+    <div class="gs-header">
+      <div class="gs-round-info">РАУНД ${TEAM.round+1} / ${TEAM.maxRounds}</div>
+      <div class="gs-round-info">ПЕРЕДАЧА ХОДА</div>
+    </div>
+    <div class="handoff-card">
+      <div class="ho-label">ПЕРЕДАЙТЕ ТЕЛЕФОН</div>
+      <span class="ho-avatar">${player.emoji}</span>
+      <div class="ho-name">${escHtml(player.name)}</div>
+      <div class="ho-warn">🙈 Остальные — не подглядывать!<br>Слова появятся только после нажатия.</div>
+    </div>
+    <div style="padding:12px 14px">
+      <button class="big-btn big-btn-blue" onclick="revealWords()">
+        <span class="bico">👀</span><span class="btxt">ПОКАЗАТЬ МОИ СЛОВА</span>
+      </button>
+    </div>`;
+  vibrate(40);
+}
+
+function revealWords() {
   TEAM.phase = 'pick';
-  renderPickPhase(player, pool);
+  renderPickPhase(TEAM.players[TEAM.currentPlayerIdx], TEAM.currentWords);
 }
 
 function renderPickPhase(player, words) {
@@ -1258,8 +1399,8 @@ function showRoundResult(player, ms, success, timeout, skipped, word) {
     ${nextName?`<div style="text-align:center;margin:14px 0;font-family:'Martian Mono',monospace;font-size:11px;color:var(--txt3);letter-spacing:1.5px">СЛЕДУЮЩИЙ:</div>
     <div style="text-align:center;font-family:'Unbounded',sans-serif;font-size:18px;font-weight:900;color:var(--b);margin-bottom:18px">${escHtml(nextName)}</div>`:''}
     <button class="big-btn big-btn-${TEAM.round>=TEAM.maxRounds?'yellow':'green'} modal-close" onclick="closeRoundModal(this)">
-      <span class="bico">${TEAM.round>=TEAM.maxRounds?'🏆':'▶'}</span>
-      <span class="btxt">${TEAM.round>=TEAM.maxRounds?'ИТОГИ':'СЛЕДУЮЩИЙ'}</span>
+      <span class="bico">${TEAM.round>=TEAM.maxRounds?'🏆':'🤝'}</span>
+      <span class="btxt">${TEAM.round>=TEAM.maxRounds?'ИТОГИ':'ПЕРЕДАТЬ ХОД'}</span>
     </button>
   </div>`;
   document.body.appendChild(overlay);
@@ -1276,7 +1417,7 @@ function closeRoundModal(btn) {
 // ══════════════════════════════════════════════
 function showFinalResults() {
   document.getElementById('teamGameArea').style.display='none';
-  document.getElementById('teamFinalArea').style.display='block';
+  document.getElementById('teamFinalArea').style.display='flex';
 
   // sort by time ascending (only those who succeeded)
   const successful = TEAM.results.filter(r=>r.success).sort((a,b)=>a.time-b.time);
@@ -1305,7 +1446,7 @@ function showTeamSetup() {
   clearInterval(TEAM.timerInterval);
   document.getElementById('teamGameArea').style.display='none';
   document.getElementById('teamFinalArea').style.display='none';
-  document.getElementById('teamStep1').style.display='block';
+  document.getElementById('teamStep1').style.display='flex';
 }
 
 function playAgain() { showTeamSetup(); }
@@ -1330,7 +1471,7 @@ function goPage(page) {
     // reset to step1 if not in active game
     if(document.getElementById('teamGameArea').style.display==='none' &&
        document.getElementById('teamFinalArea').style.display==='none') {
-      document.getElementById('teamStep1').style.display='block';
+      document.getElementById('teamStep1').style.display='flex';
     }
   }
 }
